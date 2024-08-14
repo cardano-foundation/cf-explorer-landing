@@ -1,1 +1,63 @@
-# cf-explorer-landing
+# Cardano Explorer Landing Page
+
+Cardano Explorer Landing Page, a simple web application showcasing major Cardano blockchain explorers. Built using React, Vite, and Material UI (MUI), this project provides an elegant interface to explore and access various Cardano blockchain explorers.
+
+## Features
+
+- **Responsive Design**: Optimized for different screen sizes with a flexible grid layout.
+- **Material UI Components**: Utilizes MUI for a sleek and modern UI.
+- **Dynamic Routing**: Captures URL parameters and routes users to specific explorer pages.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Project Structure](#project-structure)
+
+## Installation
+
+To set up the project locally, follow these steps:
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/yourusername/cardano-explorer.git
+   cd cardano-explorer
+
+   ```
+
+2. **Install dependencies:**
+
+   Make sure you have Node.js installed. Then run:
+
+   ```bash
+   npm install
+
+   ```
+
+3. **Start the development server:**
+
+   Make sure you have Node.js installed. Then run:
+
+   ```bash
+   npm run dev
+   ```
+
+Open your browser and navigate to http://localhost:3000 to view the application.
+
+## Project Structure
+
+    cardano-explorer/
+    | public/
+    | src/
+    |   assets/
+    |   components/
+    │       ├── Header.jsx
+    │       └── Footer.jsx
+    │   App.jsx
+    │   main.jsx
+    │   index.css
+    │ index.html
+    | jsconfig.json
+    | vite.config.js
+    | package.json
+    | README.md
