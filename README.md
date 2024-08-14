@@ -20,8 +20,8 @@ To set up the project locally, follow these steps:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/yourusername/cardano-explorer.git
-   cd cardano-explorer
+   git clone https://github.com/cardano-foundation/cf-explorer-landing.git
+   cd cf-explorer-landing
 
    ```
 
