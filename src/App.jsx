@@ -22,6 +22,13 @@ const CardanoExplorer = () => {
   const path = useLocation().pathname.replace("/", "");
 
   const explorers = {
+    cExplorer: {
+      name: "Cexplorer.io",
+      description:
+        "cexplorer.io is the oldest and most featured explorer on Cardano network since Incentivised Testnet ages.",
+      baseLink: "https://cexplorer.io/",
+      image: "assets/cexplorer.png",
+    },
     cardanoScan: {
       name: "Cardano Scan",
       description:
@@ -65,6 +72,7 @@ const CardanoExplorer = () => {
       <Card
         sx={{
           maxWidth: 345,
+          minHeight: 321,
           margin: 1,
           borderRadius: 4,
           overflow: "hidden",
