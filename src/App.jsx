@@ -27,34 +27,34 @@ const CardanoExplorer = () => {
       description:
         "A combination of block explorer and pool tool, uses it&epos;s own implementation of db-sync.",
       baseLink: "https://cardanoscan.io/",
-      image: "src/assets/cardano-scan.png",
+      image: "assets/cardano-scan.png",
     },
     poolPM: {
       name: "Pool PM",
       description:
         "Block explorer that brought out a new, refreshing concept to visualize transactions.",
       baseLink: "https://pool.pm/",
-      image: "src/assets/pool-pm.png",
+      image: "assets/pool-pm.png",
     },
     eUTxO: {
       name: "eUTxO",
       description: "Visual blockchain explorer for Cardano.",
       baseLink: "https://eutxo.org/",
-      image: "src/assets/eutxo.png",
+      image: "assets/eutxo.png",
     },
     adaStat: {
       name: "AdaStat",
       description:
         "The browser, inconspicuous at first glance, offers a great many statistics and insights.",
       baseLink: "https://adastat.net/",
-      image: "src/assets/adastat.png",
+      image: "assets/adastat.png",
     },
     explorer: {
       name: "Explorer (Beta)",
       description:
         "A Cardano explorer built by Cardano Foundation, currently under development",
       baseLink: "https://beta.explorer.cardano.org/en/",
-      image: "src/assets/beta-explorer.png",
+      image: "assets/beta-explorer.png",
     },
   };
 
