@@ -1,22 +1,28 @@
 // src/components/Footer.jsx
-import React from 'react';
-import Box from '@mui/material/Box';
+import React from "react";
+import { Box, Typography } from "@mui/material";
 
-function Footer({ imageUrl }) {
+function Footer() {
   return (
     <Box
       component="footer"
       sx={{
-        height: '100%',
-        overflow: 'hidden',
-        marginTop: 4, // Space between content and footer
+        width: "100%",
+        height: "100px",
+        overflow: "hidden",
+        background: "#0538AF",
+        marginTop: 4,
       }}
     >
-      <img
-        src={imageUrl}
-        alt="Footer"
-        style={{ width: '100%', height: 'auto' }}
-      />
+      <Box sx={{ margin: 4 }}>
+        <Typography
+          variant="subtitle1"
+          gutterBottom
+          sx={{ color: "#fff", justifyContent: 'center' }}
+        >
+          &copy;Cardano 2024
+        </Typography>
+      </Box>
     </Box>
   );
 }

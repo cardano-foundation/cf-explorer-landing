@@ -10,8 +10,8 @@ import {
   CardActions,
   Button,
 } from "@mui/material";
-import Header from 'src/components/Header';
-import Footer from 'src/components/Footer';
+import Header from "src/components/Header";
+import Footer from "src/components/Footer";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -112,38 +112,47 @@ const CardanoExplorer = () => {
   ));
 
   return (
-    <Container maxWidth="lg" style={{ marginTop: "10px" }}>
-      <Typography variant="h3" component="h4" gutterBottom textAlign={'center'}>
-        Cardano Explorers
-      </Typography>
-      <Grid container spacing={3}>
-        {selectedExplorer ? (
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Typography variant="h5" component="div">
-                  {selectedExplorer.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {selectedExplorer.description}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  component={Link}
-                  to={`${selectedExplorer.baseLink}${query.get("value") || ""}`}
-                  size="small"
-                >
-                  Learn More
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ) : (
-          explorerCards
-        )}
-      </Grid>
-    </Container>
+    <>
+      <Header imageUrl="assets/overlay-header.png" />
+      <Container maxWidth="lg" style={{ marginTop: "10px" }}>
+        <Typography
+          variant="h6"
+          gutterBottom
+        >
+          Selected by our community
+        </Typography>
+        <Grid container spacing={3}>
+          {selectedExplorer ? (
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h5" component="div">
+                    {selectedExplorer.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedExplorer.description}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    component={Link}
+                    to={`${selectedExplorer.baseLink}${
+                      query.get("value") || ""
+                    }`}
+                    size="small"
+                  >
+                    Learn More
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ) : (
+            explorerCards
+          )}
+        </Grid>
+      </Container>
+      <Footer />
+    </>
   );
 };
 
