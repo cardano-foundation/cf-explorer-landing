@@ -113,13 +113,13 @@ const CardanoExplorer = () => {
 
   return (
     <>
-      <Header imageUrl="assets/overlay-header.png" />
+      <Header />
       <Container maxWidth="lg" style={{ marginTop: "10px" }}>
         <Typography
           variant="h6"
           gutterBottom
         >
-          Selected by our community
+          Select the Explorer of your choice
         </Typography>
         <Grid container spacing={3}>
           {selectedExplorer ? (
