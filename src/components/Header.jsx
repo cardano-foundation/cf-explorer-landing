@@ -1,24 +1,29 @@
 // src/components/Header.jsx
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import cardanoLogo from "../../public/assets/logo.svg";
+import githubLogo from "../../public/assets/github.svg";
 
 function Header() {
   return (
     <>
-      <Box
-        sx={{
-          width: "100%",
-          height: "64px",
-          overflow: "hidden",
-          background: "#FFF"
-        }}
-      >
-        <img src="assets/logo.svg" style={{margin: '1rem 0 0 1.05rem'}}/>
-      </Box>
-      <Box
-        component="header"
-        sx={{
-          width: "100%",
+        <Box
+            sx={{
+                width: "100%",
+                height: "64px",
+                overflow: "hidden",
+                background: "#FFF"
+            }}
+        >
+            <img src={cardanoLogo} style={{margin: '1rem 0 0 1.05rem'}}/>
+            <a href={import.meta.env.VITE_GITHUB_URL}>
+                <img src={githubLogo} style={{float: "right", margin: '1rem 1.05rem 0 0'}}/>
+            </a>
+        </Box>
+        <Box
+            component="header"
+            sx={{
+                width: "100%",
           overflow: "hidden",
           background: "#0538AF",
         }}

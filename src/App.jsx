@@ -12,56 +12,73 @@ import {
 } from "@mui/material";
 import Header from "src/components/Header";
 import Footer from "src/components/Footer";
+import DeepLinkResolver from "src/common/DeepLinkResolver.jsx";
+import cExplorerLogo from "../public/assets/cexplorer.png";
+import cardanoScanLogo from "../public/assets/cardano-scan.png";
+import poolPmLogo from "../public/assets/pool-pm.png";
+import eutxoLogo from "../public/assets/eutxo.png";
+import adaStatLogo from "../public/assets/adastat.png";
+import betaExplorer from "../public/assets/beta-explorer.png";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
 
 const CardanoExplorer = () => {
+  const acceptedDeepLinks = ["transaction", "block", "epoch"];
   const query = useQuery();
-  const path = useLocation().pathname.replace("/", "");
+  const path = useLocation().pathname.split("/").reverse()[0]
+  const isDeepLink = acceptedDeepLinks.includes(path);
+  console.log(isDeepLink)
+  const deepLinkResolver = new DeepLinkResolver(path, query);
 
   const explorers = {
     cExplorer: {
       name: "Cexplorer.io",
       description:
         "cexplorer.io is the oldest and most featured explorer on Cardano network since Incentivised Testnet ages.",
-      baseLink: "https://cexplorer.io/",
-      image: "assets/cexplorer.png",
+      image: cExplorerLogo,
+      url: deepLinkResolver.getCExplorerLink("https://cexplorer.io/"),
+      isDeepLink: true
     },
     cardanoScan: {
       name: "Cardano Scan",
       description:
         "A combination of block explorer and pool tool, uses it&epos;s own implementation of db-sync.",
-      baseLink: "https://cardanoscan.io/",
-      image: "assets/cardano-scan.png",
+      url: deepLinkResolver.getCardanoScanLink("https://cardanoscan.io/"),
+      image: cardanoScanLogo,
+      isDeepLink: true
     },
     poolPM: {
       name: "Pool PM",
       description:
         "Block explorer that brought out a new, refreshing concept to visualize transactions.",
-      baseLink: "https://pool.pm/",
-      image: "assets/pool-pm.png",
+      url: "https://pool.pm/",
+      image: poolPmLogo,
+      isDeepLink: false
     },
     eUTxO: {
       name: "eUTxO",
       description: "Visual blockchain explorer for Cardano.",
-      baseLink: "https://eutxo.org/",
-      image: "assets/eutxo.png",
+      url: "https://eutxo.org/",
+      image: eutxoLogo,
+      isDeepLink: false
     },
     adaStat: {
       name: "AdaStat",
       description:
         "The browser, inconspicuous at first glance, offers a great many statistics and insights.",
-      baseLink: "https://adastat.net/",
-      image: "assets/adastat.png",
+      url: "https://adastat.net/",
+      image: adaStatLogo,
+      isDeepLink: false
     },
     explorer: {
       name: "Explorer (Beta)",
       description:
         "A Cardano explorer built by Cardano Foundation, currently under development",
-      baseLink: "https://beta.explorer.cardano.org/en/",
-      image: "assets/beta-explorer.png",
+      url: deepLinkResolver.getCFBetaExplorerLink("https://beta.explorer.cardano.org/en/"),
+      image: betaExplorer,
+      isDeepLink: true
     },
   };
 
@@ -76,6 +93,7 @@ const CardanoExplorer = () => {
           margin: 1,
           borderRadius: 4,
           overflow: "hidden",
+          opacity: isDeepLink && !explorer.isDeepLink ? 0.5 : 1,
         }}
       >
         <CardMedia
@@ -87,7 +105,8 @@ const CardanoExplorer = () => {
             width: "100%",
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
-            position: "relative",
+            position: "relative"
+
           }}
         />
         <CardContent>
@@ -100,8 +119,9 @@ const CardanoExplorer = () => {
         </CardContent>
         <CardActions>
           <Button
+            disabled={isDeepLink && !explorer.isDeepLink}
             component={Link}
-            to={`${explorer.baseLink}${query.get("value") || ""}`}
+            to={`${explorer.url}${query.get("value") || ""}`}
             size="small"
           >
             Continue
@@ -119,7 +139,7 @@ const CardanoExplorer = () => {
           variant="h6"
           gutterBottom
         >
-          Select the Explorer of your choice
+          Select the Explorer of your choice {path}
         </Typography>
         <Grid container spacing={3}>
           {selectedExplorer ? (
