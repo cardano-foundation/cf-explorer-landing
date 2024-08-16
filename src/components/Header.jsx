@@ -1,8 +1,8 @@
 // src/components/Header.jsx
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import cardanoLogo from "../../public/assets/logo.svg";
-import githubLogo from "../../public/assets/github.svg";
+import cardanoLogo from "/assets/logo.svg";
+import githubLogo from "/assets/github.svg";
 
 function Header() {
   return (

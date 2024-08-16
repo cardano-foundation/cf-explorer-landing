@@ -13,12 +13,12 @@ import {
 import Header from "src/components/Header";
 import Footer from "src/components/Footer";
 import DeepLinkResolver from "src/common/DeepLinkResolver.jsx";
-import cExplorerLogo from "../public/assets/cexplorer.png";
-import cardanoScanLogo from "../public/assets/cardano-scan.png";
-import poolPmLogo from "../public/assets/pool-pm.png";
-import eutxoLogo from "../public/assets/eutxo.png";
-import adaStatLogo from "../public/assets/adastat.png";
-import betaExplorer from "../public/assets/beta-explorer.png";
+import cExplorerLogo from "/assets/cexplorer.png";
+import cardanoScanLogo from "/assets/cardano-scan.png";
+import poolPmLogo from "/assets/pool-pm.png";
+import eutxoLogo from "/assets/eutxo.png";
+import adaStatLogo from "/assets/adastat.png";
+import betaExplorer from "/assets/beta-explorer.png";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
