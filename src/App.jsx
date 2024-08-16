@@ -19,6 +19,7 @@ import poolPmLogo from "/assets/pool-pm.png";
 import eutxoLogo from "/assets/eutxo.png";
 import adaStatLogo from "/assets/adastat.png";
 import betaExplorer from "/assets/beta-explorer.png";
+import poolTool from "/assets/poolTool.png";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -79,6 +80,13 @@ const CardanoExplorer = () => {
       image: betaExplorer,
       isDeepLink: true
     },
+    poolTool: {
+      name: "PoolTool",
+      description: "One of the most feature-rich, unbiased pool tools. Also offers a native app.",
+      url: "https://pooltool.io/",
+      image: poolTool,
+      isDeepLink: false
+    }
   };
 
   const selectedExplorer = explorers[path] || explorers[query.get("section")];
@@ -90,9 +98,10 @@ const CardanoExplorer = () => {
           maxWidth: 345,
           minHeight: 321,
           margin: 1,
-          borderRadius: 4,
+          borderRadius: '4px',
           overflow: "hidden",
           opacity: isDeepLink && !explorer.isDeepLink ? 0.5 : 1,
+          boxShadow: 8
         }}
       >
         <CardMedia
