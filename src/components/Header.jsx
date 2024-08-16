@@ -3,7 +3,6 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import cardanoLogo from "/assets/logo.svg";
 import githubLogo from "/assets/github.svg";
-import headerImage from "/assets/overlay-header.png";
 function Header() {
   return (
     <>
