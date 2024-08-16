@@ -12,7 +12,8 @@ function Footer() {
         height: "120px",
         overflow: "hidden",
         background: "#303846",
-        position: "fixed",
+        position: "relative",
+        marginTop: '20px',
         left: 0,
         bottom: 0
       }}

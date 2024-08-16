@@ -68,7 +68,7 @@ class DeepLinkResolver {
       case "block":
         return this.query.get("id");
       case "transaction":
-        return this.query.get("tx");
+        return this.query.get("id");
     }
   }
 }
