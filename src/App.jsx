@@ -8,7 +8,7 @@ import {
   CardContent,
   Typography,
   CardActions,
-  Button,
+  Button, Alert,
 } from "@mui/material";
 import Header from "src/components/Header";
 import Footer from "src/components/Footer";
@@ -29,7 +29,6 @@ const CardanoExplorer = () => {
   const query = useQuery();
   const path = useLocation().pathname.split("/").reverse()[0]
   const isDeepLink = acceptedDeepLinks.includes(path);
-  console.log(isDeepLink)
   const deepLinkResolver = new DeepLinkResolver(path, query);
 
   const explorers = {
@@ -134,12 +133,16 @@ const CardanoExplorer = () => {
   return (
     <>
       <Header />
+
       <Container maxWidth="lg" style={{ marginTop: "10px" }}>
         <Typography
           variant="h6"
           gutterBottom
         >
-          Select the Explorer of your choice {path}
+          Select the Explorer of your choice:
+          {isDeepLink &&
+              <Alert severity={"info"}>You will be forwarded to {path} {deepLinkResolver.getValue()} after choosing your favorite Explorer</Alert>
+          }
         </Typography>
         <Grid container spacing={3}>
           {selectedExplorer ? (

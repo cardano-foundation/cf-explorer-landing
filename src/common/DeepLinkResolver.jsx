@@ -17,13 +17,13 @@ class DeepLinkResolver {
     var link = baseLink;
     switch (this.mode) {
       case "epoch":
-        link += `epoch/${this.query.get("number")}`;
+        link += `epoch/${this.getValue()}`;
         break;
       case "block":
-        link += `block/${this.query.get("id")}`;
+        link += `block/${this.getValue()}`;
         break;
       case "transaction":
-        link += `tx/${this.query.get("tx")}`;
+        link += `tx/${this.getValue()}`;
         break;
     }
     return link;
@@ -33,13 +33,13 @@ class DeepLinkResolver {
     var link = baseLink;
     switch (this.mode) {
       case "epoch":
-        link += `epoch/${this.query.get("number")}`;
+        link += `epoch/${this.getValue()}`;
         break;
       case "block":
-        link += `search?filter=blocks&value=/${this.query.get("id")}`;
+        link += `search?filter=blocks&value=/${this.getValue()}`;
         break;
       case "transaction":
-        link += `transaction/${this.query.get("tx")}`;
+        link += `transaction/${this.getValue()}`;
         break;
     }
     return link;
@@ -49,16 +49,27 @@ class DeepLinkResolver {
     var link = baseLink;
     switch (this.mode) {
       case "epoch":
-        link += `epoch/${this.query.get("number")}`;
+        link += `epoch/${this.getValue()}`;
         break;
       case "block":
-        link += `block/${this.query.get("id")}`;
+        link += `block/${this.getValue()}`;
         break;
       case "transaction":
-        link += `tx/${this.query.get("tx")}`;
+        link += `tx/${this.getValue()}`;
         break;
     }
     return link;
+  }
+
+  getValue() {
+    switch (this.mode) {
+      case "epoch":
+        return this.query.get("number");
+      case "block":
+        return this.query.get("id");
+      case "transaction":
+        return this.query.get("tx");
+    }
   }
 }
 
