@@ -42,7 +42,7 @@ function Footer() {
             </Grid>
             <Grid item xs={2}/>
             <Grid item xs={12} style={{textAlign: "center", color: "white", fontSize: "small"}}>
-                © 2021 Cardano Foundation. All rights reserved.
+                © 2024 Cardano Foundation. All rights reserved.
             </Grid>
         </Grid>
     </Box>
