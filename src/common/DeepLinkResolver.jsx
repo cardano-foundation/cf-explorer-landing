@@ -25,6 +25,9 @@ class DeepLinkResolver {
       case "transaction":
         link += `tx/${this.getValue()}`;
         break;
+      case "address":
+        link += `address/${this.getValue()}`;
+        break;
     }
     return link;
   }
@@ -40,6 +43,9 @@ class DeepLinkResolver {
         break;
       case "transaction":
         link += `transaction/${this.getValue()}`;
+        break;
+      case "address":
+        link += `address/${this.getValue()}`;
         break;
     }
     return link;
@@ -57,6 +63,9 @@ class DeepLinkResolver {
       case "transaction":
         link += `tx/${this.getValue()}`;
         break;
+      case "address":
+        link += `address/${this.getValue()}`;
+        break;
     }
     return link;
   }
@@ -69,6 +78,8 @@ class DeepLinkResolver {
         return this.query.get("id");
       case "transaction":
         return this.query.get("id");
+      case "address":
+        return this.query.get("address");
     }
   }
 }

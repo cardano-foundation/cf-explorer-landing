@@ -26,7 +26,7 @@ const useQuery = () => {
 };
 
 const CardanoExplorer = () => {
-  const acceptedDeepLinks = ["transaction", "block", "epoch"];
+  const acceptedDeepLinks = ["transaction", "block", "epoch", "address"];
   const query = useQuery();
   const path = useLocation().pathname.split("/").reverse()[0]
   const isDeepLink = acceptedDeepLinks.includes(path);
