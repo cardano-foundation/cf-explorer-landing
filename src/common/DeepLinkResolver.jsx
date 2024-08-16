@@ -61,7 +61,7 @@ class DeepLinkResolver {
         link += `block/${this.getValue()}`;
         break;
       case "transaction":
-        link += `tx/${this.getValue()}`;
+        link += `transaction/${this.getValue()}`;
         break;
       case "address":
         link += `address/${this.getValue()}`;
