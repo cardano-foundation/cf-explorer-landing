@@ -48,8 +48,10 @@ Open your browser and navigate to http://localhost:3000 to view the application.
 
     cardano-explorer/
     | public/
-    | src/
     |   assets/
+    | src/
+    |   common/
+    |       |── DeepLinkResolver.jsx
     |   components/
     │       ├── Header.jsx
     │       └── Footer.jsx
