@@ -8,15 +8,7 @@ export const HeaderSection = styled("header")`
     width: 100%;
     height: 280px;
     overflow: hidden;
-    background: url('/assets/hero-banner.svg');
-    
-    &::before {
-        content: "";
-        position: absolute;
-        inset: 5% 0% 69% 0;
-        background-image: linear-gradient(248deg, #305bbd, #0035ad);
-        z-index: -1;
-    }
+    background: #0538AF url('/assets/hero-banner.svg');
 `;
 
 function Header() {
