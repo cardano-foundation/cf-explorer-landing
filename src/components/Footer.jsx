@@ -18,7 +18,7 @@ function Footer() {
         bottom: 0
       }}
     >
-        <Grid container spacing={2} style={{color: "white", marginTop: "1px", fontSize: "small"}}>
+        <Grid container spacing={1} style={{color: "#ebedf0", marginTop: "1px", fontSize: "14px", cursor: 'pointer'}}>
             <Grid item xs={3}/>
             <Grid item xs={2} style={{textAlign: "center"}}>
                 <div style={{fontWeight: "bold"}}>Support</div>
@@ -35,7 +35,7 @@ function Footer() {
                 <div onClick={() => location.href = 'https://cardanofoundation.org'}>News</div>
                 <div onClick={() => location.href = 'https://developers.cardano.org/docs/portal-contribute/'}>Contribute</div>
             </Grid>
-            <Grid item xs={3}/>
+            
             <Grid item xs={12} style={{textAlign: "center", color: "white", fontSize: "small"}}>
                 ® Cardano
             </Grid>

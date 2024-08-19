@@ -154,7 +154,7 @@ const CardanoExplorer = () => {
             </Alert>
           )}
         </Typography>
-        <Grid container spacing={3}>
+        <Grid container spacing={2} sx={{display: { xs: 'grid', sm: 'flex' }, justifyContent: 'center', alignItems: 'center'}}>
           {selectedExplorer ? (
             <Grid item xs={12}>
               <CardLink

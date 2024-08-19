@@ -1,9 +1,29 @@
 // src/components/Header.jsx
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, styled } from "@mui/material";
 import cardanoLogo from "/assets/logo.svg";
 import githubLogo from "/assets/github.svg";
+
+export const HeaderSection = styled("header")`
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background: url('/assets/hero-banner.svg');
+    
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 66%;
+        background-image: linear-gradient(248deg, #305bbd, #0035ad);
+        z-index: -1;
+    }
+`;
+
 function Header() {
+
   return (
     <>
         <Box
@@ -20,15 +40,8 @@ function Header() {
                 <img src={githubLogo} style={{float: "right", margin: '1rem 1.05rem 0 0'}}/>
             </a>
         </Box>
-        <Box
-            component="header"
-            sx={{
-                width: "100%",
-                overflow: "hidden",
-                background: "#0538AF",
-        }}
-      >
-            <Box sx={{marginLeft: 4, padding: 3}}>
+        <HeaderSection>
+            <Box sx={{margin: '0 auto', padding: '83px'}}>
                 <Typography variant="h1" gutterBottom
                             sx={{margin: '1rem 0 0 1.05rem', color: "#fff", fontSize: '3rem', fontWeight: '700'}}>
                     Explorers
@@ -37,7 +50,7 @@ function Header() {
                     List of Cardano Explorers from our Community and Foundation.
                 </Typography>
             </Box>
-        </Box>
+        </HeaderSection>
     </>
   );
 }
