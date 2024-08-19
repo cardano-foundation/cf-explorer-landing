@@ -13,10 +13,7 @@ export const HeaderSection = styled("header")`
     &::before {
         content: "";
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 66%;
+        inset: 5% 0% 69% 0;
         background-image: linear-gradient(248deg, #305bbd, #0035ad);
         z-index: -1;
     }
