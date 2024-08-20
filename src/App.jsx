@@ -155,7 +155,7 @@ const CardanoExplorer = () => {
                 <Typography variant="h6" component="div">
                   {explorer.name}
                 </Typography>
-                <Chip
+                {isDeepLink && (<Chip
                   color={!explorer.isDeepLink ? "default" : "success"}
                   icon={<LinkIcon />}
                   label={
@@ -165,7 +165,7 @@ const CardanoExplorer = () => {
                   }
                   size="small"
                   variant={!explorer.isDeepLink ? "outlined" : ""}
-                />
+                />)}
               </Stack>
               <Typography variant="body1" color="text.secondary">
                 {explorer.description}
