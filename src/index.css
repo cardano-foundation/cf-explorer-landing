@@ -1,10 +1,9 @@
 body {
   margin: 0;
   padding: 0;
-  color: #24262e;
-  font-family: "Roboto", sans-serif;
   font-style: normal;
-  background: #f6f9ff;
+  font-family: 'Chivo', sans-serif;
+  background: #fff;
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -13,8 +12,4 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-}
-
-h1 {
-  font-weight: 700;
 }

@@ -9,6 +9,8 @@ import {
   Typography,
   Alert,
   styled,
+  Stack,
+  Chip,
 } from "@mui/material";
 import Header from "src/components/Header";
 import Footer from "src/components/Footer";
@@ -20,15 +22,32 @@ import eutxoLogo from "/assets/eutxo.png";
 import adaStatLogo from "/assets/adastat.png";
 import betaExplorer from "/assets/beta-explorer.png";
 import poolTool from "/assets/pool-tool.png";
+import LinkIcon from "@mui/icons-material/Link";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
 
+export const ContentSection = styled("section")`
+  margin-top: 40px;
+`;
+
 export const CardLink = styled("a")`
   display: contents;
   cursor: pointer;
 `;
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  width: 345,
+  height: 300,
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: "12px",
+  transition: "transform 0.5s ease-in-out",
+
+  "&:hover": {
+    transform: "scale(1.02)",
+  },
+}));
 
 const CardanoExplorer = () => {
   const acceptedDeepLinks = ["transaction", "block", "epoch", "address"];
@@ -37,7 +56,7 @@ const CardanoExplorer = () => {
   const isDeepLink = acceptedDeepLinks.includes(path);
   const deepLinkResolver = new DeepLinkResolver(path, query);
 
-  const explorers = {
+  const listOfExplorers = {
     cExplorer: {
       name: "Cexplorer.io",
       description:
@@ -97,87 +116,128 @@ const CardanoExplorer = () => {
     },
   };
 
-  const selectedExplorer = explorers[path] || explorers[query.get("section")];
+  const selectedExplorer =
+    listOfExplorers[path] || listOfExplorers[query.get("section")];
 
-  const explorerCards = Object.entries(explorers).map(([key, explorer]) => (
-    <Grid item xs={12} sm={6} md={4} key={key}>
-      <CardLink
-        href={`${explorer.url}${query.get("value") || ""}`}
-        target="_blank"
-      >
-        <Card
-          sx={{
-            maxWidth: 345,
-            minHeight: 263,
-            margin: 1,
-            borderRadius: "12.8px",
-            overflow: "hidden",
-            opacity: isDeepLink && !explorer.isDeepLink ? 0.5 : 1,
-            boxShadow: isDeepLink && !explorer.isDeepLink ? 0 : 4,
-          }}
+  const explorerCards = Object.entries(listOfExplorers).map(
+    ([key, explorer]) => (
+      <Grid item xs={12} sm={6} md={4} key={key}>
+        <CardLink
+          href={`${explorer.url}${query.get("value") || ""}`}
+          target="_blank"
         >
-          <CardMedia
-            component="img"
-            height="150"
-            image={explorer.image}
-            alt={explorer.name}
+          <StyledCard
             sx={{
-              width: "100%",
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-              position: "relative",
+              opacity: isDeepLink && !explorer.isDeepLink ? 0.5 : 1,
+              boxShadow: isDeepLink && !explorer.isDeepLink ? 0 : 4,
             }}
-          />
-          <CardContent>
-            <Typography variant="h5" component="div">
-              {explorer.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {explorer.description}
-            </Typography>
-          </CardContent>
-        </Card>
-      </CardLink>
-    </Grid>
-  ));
+          >
+            <CardMedia
+              component="img"
+              height="150"
+              image={explorer.image}
+              alt={explorer.name}
+              sx={{
+                width: "100%",
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+                position: "relative",
+              }}
+            />
+            <CardContent>
+              <Stack
+                direction="row"
+                spacing={2}
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography variant="h6" component="div">
+                  {explorer.name}
+                </Typography>
+                <Chip
+                  color={!explorer.isDeepLink ? "default" : "success"}
+                  icon={<LinkIcon />}
+                  label={
+                    !explorer.isDeepLink
+                      ? "link not available"
+                      : "link available"
+                  }
+                  size="small"
+                  variant={!explorer.isDeepLink ? "outlined" : ""}
+                />
+              </Stack>
+              <Typography variant="body1" color="text.secondary">
+                {explorer.description}
+              </Typography>
+            </CardContent>
+          </StyledCard>
+        </CardLink>
+      </Grid>
+    )
+  );
 
   return (
     <>
       <Header />
-      <Container maxWidth="lg" style={{ marginTop: "10px" }}>
-        <Typography variant="h6" gutterBottom>
-          Select the Explorer of your choice
-          {isDeepLink && (
-            <Alert severity={"info"}>
-              You will be forwarded to {path} {deepLinkResolver.getValue()}{" "}
-              after choosing your favorite Explorer
-            </Alert>
-          )}
-        </Typography>
-        <Grid container spacing={2} sx={{display: { xs: 'grid', sm: 'flex' }, justifyContent: 'center', alignItems: 'center'}}>
-          {selectedExplorer ? (
+      <ContentSection>
+        <Container maxWidth="lg">
+          <Grid container spacing={3}>
+            {isDeepLink && (
+              <Grid item xs={12}>
+                <Alert
+                  severity={"info"}
+                  sx={{
+                    borderRadius: "16px",
+                  }}
+                >
+                  You will be forwarded to {path} {deepLinkResolver.getValue()}{" "}
+                  after choosing your favorite Explorer
+                </Alert>
+              </Grid>
+            )}
             <Grid item xs={12}>
-              <CardLink
-                href={`${selectedExplorer.baseLink}${query.get("value") || ""}`}
-                target="_blank"
-              >
-                <Card>
-                  <CardContent>
-                    <Typography variant="h5" component="div">
-                      {selectedExplorer.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {selectedExplorer.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </CardLink>
+              <Typography variant="h6" gutterBottom>
+                Select the Explorer of your choice
+              </Typography>
             </Grid>
-          ) : (
-            explorerCards
-          )}
-        </Grid>
-      </Container>
+            <Grid item xs={12}>
+              <Grid
+                container
+                spacing={3}
+                sx={{
+                  display: { xs: "grid", sm: "flex" },
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {selectedExplorer ? (
+                  <Grid item xs={12}>
+                    <CardLink
+                      href={`${selectedExplorer.baseLink}${
+                        query.get("value") || ""
+                      }`}
+                      target="_blank"
+                    >
+                      <StyledCard>
+                        <CardContent>
+                          <Typography variant="h6" component="div">
+                            {selectedExplorer.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {selectedExplorer.description}
+                          </Typography>
+                        </CardContent>
+                      </StyledCard>
+                    </CardLink>
+                  </Grid>
+                ) : (
+                  explorerCards
+                )}
+              </Grid>
+            </Grid>
+          </Grid>
+        </Container>
+      </ContentSection>
       <Footer />
     </>
   );
