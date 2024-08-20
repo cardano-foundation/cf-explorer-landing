@@ -30,6 +30,7 @@ const useQuery = () => {
 
 export const ContentSection = styled("section")`
   margin-top: 40px;
+  margin-bottom: 40px;
 `;
 
 export const CardLink = styled("a")`
