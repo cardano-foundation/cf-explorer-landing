@@ -24,7 +24,7 @@ import betaExplorer from "/assets/beta-explorer.png";
 import poolTool from "/assets/pool-tool.png";
 import LinkIcon from "@mui/icons-material/Link";
 
-import { useTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material";
 import { lightTheme, darkTheme } from "src/common/style/theme";
 
 const useQuery = () => {
@@ -207,7 +207,7 @@ const CardanoExplorer = () => {
               </Grid>
             )}
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" color={theme.palette.text.primary} gutterBottom>
                 Select the Explorer of your choice
               </Typography>
             </Grid>

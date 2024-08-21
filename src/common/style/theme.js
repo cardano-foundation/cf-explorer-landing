@@ -25,7 +25,8 @@ const commonTypography = {
         lineHeight: '24px',
         letterSpacing: '-0.5px',
         textAlign: 'left',
-        margin: '6% 0'
+        margin: '6% 0',
+        color: 'inherit',
     }
 };
 
@@ -38,6 +39,7 @@ export const lightTheme = createTheme({
         },
         text: {
             primary: '#000000',
+            secondary: '#ffffff'
         },
     },
     typography: {
@@ -55,6 +57,7 @@ export const darkTheme = createTheme({
         },
         text: {
             primary: '#ffffff',
+            secondary: '#000000'
         },
     },
     typography: {

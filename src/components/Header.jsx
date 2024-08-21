@@ -77,10 +77,10 @@ function Header({ toggleTheme, isDarkMode }) {
             color: "#fff",
           }}
         >
-          <Typography variant="h1" gutterBottom>
+          <Typography variant="h1" color={theme.palette.text.secondary} gutterBottom>
             Explorers
           </Typography>
-          <Typography variant="subtitle1" gutterBottom>
+          <Typography variant="subtitle1" color={theme.palette.text.secondary} gutterBottom>
             List of Cardano Explorers from our Community and Foundation.
           </Typography>
         </Box>
