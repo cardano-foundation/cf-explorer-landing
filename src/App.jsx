@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Container,
@@ -55,10 +55,20 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 const CardanoExplorer = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const darkModePreference = localStorage.getItem("darkMode");
+    if (darkModePreference) {
+      setIsDarkMode(darkModePreference === "true");
+    }
+  }, []);
+
   const theme = isDarkMode ? darkTheme : lightTheme;
 
   const toggleTheme = () => {
+    const newDarkMode = !isDarkMode;
     setIsDarkMode(!isDarkMode);
+    localStorage.setItem("darkMode", newDarkMode);
   };
 
   const acceptedDeepLinks = ["transaction", "block", "epoch", "address"];
