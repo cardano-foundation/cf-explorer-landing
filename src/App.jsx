@@ -61,7 +61,7 @@ const CardanoExplorer = () => {
     cExplorer: {
       name: "Cexplorer.io",
       description:
-        "Most featured explorer on Cardano network since Incentivised Testnet ages.",
+        "Ideal for those who need comprehensive data on Cardano's blockchain thanks to its robust analytical tools.",
       image: cExplorerLogo,
       url: deepLinkResolver.getCExplorerLink("https://cexplorer.io/"),
       isDeepLink: true,
@@ -69,7 +69,7 @@ const CardanoExplorer = () => {
     cardanoScan: {
       name: "Cardano Scan",
       description:
-        "A combination of block explorer and pool tool, uses it's own implementation of db-sync.",
+        "Essential for users seeking detailed and reliable data on a feature rich explorer.",
       url: deepLinkResolver.getCardanoScanLink("https://cardanoscan.io/"),
       image: cardanoScanLogo,
       isDeepLink: true,
@@ -77,14 +77,14 @@ const CardanoExplorer = () => {
     poolPM: {
       name: "Pool PM",
       description:
-        "Block explorer that brought out a new, refreshing concept to visualize transactions.",
+        "Essential for NFT enthusiasts and creators who need to monitor and showcase their assets. Dynamic tool for visualizing NFTs. ",
       url: "https://pool.pm/",
       image: poolPmLogo,
       isDeepLink: false,
     },
     eUTxO: {
       name: "eUTxO",
-      description: "Visual blockchain explorer for Cardano.",
+      description: "Interactive and engaging way to visualize Cardano's block content through it's innovative and gamified interface.",
       url: "https://eutxo.org/",
       image: eutxoLogo,
       isDeepLink: false,
@@ -92,7 +92,7 @@ const CardanoExplorer = () => {
     adaStat: {
       name: "AdaStat",
       description:
-        "The browser, inconspicuous at first glance, offers a great many statistics and insights.",
+        "Ideal for analysts and researcher who need to advanced statistical analyses and network monitoring.",
       url: "https://adastat.net/",
       image: adaStatLogo,
       isDeepLink: false,
@@ -100,7 +100,7 @@ const CardanoExplorer = () => {
     explorer: {
       name: "Explorer (Beta)",
       description:
-        "A Cardano explorer built by Cardano Foundation, currently under development",
+        "Focused on enterprises and policymakers. Currently under development, built by Cardano Foundation.",
       url: deepLinkResolver.getCFBetaExplorerLink(
         "https://beta.explorer.cardano.org/en/"
       ),
@@ -110,7 +110,7 @@ const CardanoExplorer = () => {
     poolTool: {
       name: "PoolTool",
       description:
-        "One of the most feature-rich, unbiased pool tools. Also offers a native app.",
+        "Essential for those who need to make informed staking decisions. Provides data on the performance of pools. ",
       url: "https://pooltool.io/",
       image: poolTool,
       isDeepLink: false,
