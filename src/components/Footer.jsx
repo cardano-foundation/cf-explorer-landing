@@ -42,7 +42,6 @@ function Footer() {
         width: "100%",
         background: "#303846",
         position: "relative",
-        marginTop: "20px",
         color: "#ebedf0",
         fontSize: "14px",
       }}

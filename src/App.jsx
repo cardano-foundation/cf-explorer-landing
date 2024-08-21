@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Container,
@@ -24,14 +24,17 @@ import betaExplorer from "/assets/beta-explorer.png";
 import poolTool from "/assets/pool-tool.png";
 import LinkIcon from "@mui/icons-material/Link";
 
+import { useTheme, ThemeProvider } from "@mui/material/styles";
+import { lightTheme, darkTheme } from "src/common/style/theme";
+
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
 
-export const ContentSection = styled("section")`
-  margin-top: 40px;
-  margin-bottom: 40px;
-`;
+export const ContentSection = styled("section")(({ theme }) => ({
+  paddingBottom: "40px",
+  backgroundColor: theme.palette.background.default,
+}));
 
 export const CardLink = styled("a")`
   display: contents;
@@ -51,6 +54,13 @@ const StyledCard = styled(Card)(({ theme }) => ({
 }));
 
 const CardanoExplorer = () => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   const acceptedDeepLinks = ["transaction", "block", "epoch", "address"];
   const query = useQuery();
   const path = useLocation().pathname.split("/").reverse()[0];
@@ -178,8 +188,8 @@ const CardanoExplorer = () => {
   );
 
   return (
-    <>
-      <Header />
+    <ThemeProvider theme={theme}>
+      <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
       <ContentSection>
         <Container maxWidth="lg">
           <Grid container spacing={3}>
@@ -240,7 +250,7 @@ const CardanoExplorer = () => {
         </Container>
       </ContentSection>
       <Footer />
-    </>
+    </ThemeProvider>
   );
 };
 
