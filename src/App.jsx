@@ -127,10 +127,14 @@ const CardanoExplorer = () => {
     },
   };
 
+  const sortedExplorers = Object.entries(listOfExplorers).sort(
+    ([, a], [, b]) => b.isDeepLink - a.isDeepLink
+  );
+
   const selectedExplorer =
     listOfExplorers[path] || listOfExplorers[query.get("section")];
 
-  const explorerCards = Object.entries(listOfExplorers).map(
+  const explorerCards = sortedExplorers.map(
     ([key, explorer]) => (
       <Grid item xs={12} sm={6} md={4} key={key}>
         <CardLink
