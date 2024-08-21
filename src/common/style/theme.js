@@ -39,7 +39,7 @@ export const lightTheme = createTheme({
         },
         text: {
             primary: '#000000',
-            secondary: '#ffffff'
+            secondary: '#000000'
         },
     },
     typography: {
@@ -57,7 +57,7 @@ export const darkTheme = createTheme({
         },
         text: {
             primary: '#ffffff',
-            secondary: '#000000'
+            secondary: '#E3E3E3'
         },
     },
     typography: {
