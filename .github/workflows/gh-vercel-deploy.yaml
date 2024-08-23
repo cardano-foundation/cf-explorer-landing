@@ -1,45 +1,47 @@
-# Workflow to build and deploy site to Vercel using static files
-# Name of Workflow
-name: vercel-deploy-branch-deploys
+name: vercel-deploy
 
-# Controls when the action will run. Triggers the workflow on push
-# events but only for specified branches
 on:
   push:
     branches:
       - main
+      - develop
+  pull_request:
+    types: [ opened, synchronize ]
 
 env:
   PRODUCTION_BRANCH: main
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  deploy-branch:
+  vercel-deploy:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-
-    - name: Make some more metadata available as variables
-      id: metadata
-      run: |
-        TRIGGER_BRANCH=${GITHUB_REF##*/}
-        echo "TRIGGER_BRANCH=${TRIGGER_BRANCH}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
-        echo "DEPLOY_NAME=BRANCH-${TRIGGER_BRANCH}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
-        if [ "${TRIGGER_BRANCH}" == "${PRODUCTION_BRANCH}" ]
-        then
-          echo "VERCEL_ARGS=--prod" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
-        fi
-
-    # Checks-out your repository under $GITHUB_WORKSPACE
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         submodules: recursive  # Fetch private content
         fetch-depth: 1         # Fetch all history for .GitInfo and .Lastmod
         lfs: true
 
-    # Initiate GH deployment status
+    - name: ⛮ cf-gha-baseline
+      uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: ⛮ Set vercel deploy metadata
+      id: metadata
+      run: |
+        if [ "${TRIGGERING_REF}" == "push" ]
+        then
+          if [ "${BRANCH_NAME}" == "${PRODUCTION_BRANCH}" ]
+          then
+            echo "VERCEL_ARGS=--prod" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
+          fi
+          echo "DEPLOY_NAME=BRANCH-${BRANCH_NAME}" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
+        elif [ "${TRIGGERING_REF}" == "pr" ]
+        then
+          echo "DEPLOY_NAME=PR-${PR_NUMBER}" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
+        fi
+
     - name: Start Deployment
       uses: bobheadxi/deployments@v0.6.2
       id: deployment
@@ -87,7 +89,13 @@ jobs:
         vercel-args: ${{ steps.metadata.outputs.VERCEL_ARGS }}
         working-directory: dist
 
-    # Update GH deployment status
+    - name: Comment PR
+      uses: thollander/actions-comment-pull-request@v1
+      if: ${{ github.event_name == 'pull_request' }}
+      with:
+        message: 'Vercel PR (merge commit) deploy URL: ${{ steps.vercel-action.outputs.preview-url }}'
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Update Deployment Status
       uses: bobheadxi/deployments@v0.6.2
       if: always()
