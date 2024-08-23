@@ -15,6 +15,13 @@ jobs:
   vercel-deploy:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive  # Fetch private content
+        fetch-depth: 1         # Fetch all history for .GitInfo and .Lastmod
+        lfs: true
+
     - name: ⛮ cf-gha-baseline
       uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
       with:
@@ -35,15 +42,6 @@ jobs:
           echo "DEPLOY_NAME=PR-${PR_NUMBER}" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
         fi
 
-    # Checks-out your repository under $GITHUB_WORKSPACE
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive  # Fetch private content
-        fetch-depth: 1         # Fetch all history for .GitInfo and .Lastmod
-        lfs: true
-
-    # Initiate GH deployment status
     - name: Start Deployment
       uses: bobheadxi/deployments@v0.6.2
       id: deployment
@@ -91,7 +89,6 @@ jobs:
         vercel-args: ${{ steps.metadata.outputs.VERCEL_ARGS }}
         working-directory: dist
 
-    # Update GH deployment status
     - name: Update Deployment Status
       uses: bobheadxi/deployments@v0.6.2
       if: always()
