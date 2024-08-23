@@ -89,6 +89,13 @@ jobs:
         vercel-args: ${{ steps.metadata.outputs.VERCEL_ARGS }}
         working-directory: dist
 
+    - name: Comment PR
+      uses: thollander/actions-comment-pull-request@v1
+      if: ${{ github.event_name == 'pull_request' }}
+      with:
+        message: 'Vercel PR (merge commit) deploy URL: ${{ steps.vercel-action.outputs.preview-url }}'
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Update Deployment Status
       uses: bobheadxi/deployments@v0.6.2
       if: always()
