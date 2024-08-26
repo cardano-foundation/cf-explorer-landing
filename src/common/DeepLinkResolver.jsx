@@ -13,6 +13,8 @@ class DeepLinkResolver {
     this.query = query;
   }
 
+
+
   getCExplorerLink (baseLink) {
     var link = baseLink;
     switch (this.mode) {
@@ -80,6 +82,32 @@ class DeepLinkResolver {
         return this.query.get("id");
       case "address":
         return this.query.get("address");
+    }
+  }
+
+  isCorrectPathVariable() {
+    switch (this.mode) {
+      case "epoch":
+        return this.query.has("number");
+      case "block":
+        return this.query.has("id");
+      case "transaction":
+        return this.query.has("id");
+      case "address":
+        return this.query.has("address");
+    }
+  }
+
+  getCorrectPathVariable() {
+    switch (this.mode) {
+      case "epoch":
+        return "number";
+      case "block":
+        return "id";
+      case "transaction":
+        return "id";
+      case "address":
+        return "address";
     }
   }
 }
