@@ -52,7 +52,6 @@ function Header({ toggleTheme, isDarkMode }) {
               style={{ marginLeft: "2rem", marginTop: "1rem" }}
             >
               <IconButton
-                onClick={toggleTheme}
                 sx={{ color: theme.palette.text.primary }}
               >
                 <GitHub />
