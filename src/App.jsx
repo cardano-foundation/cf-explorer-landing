@@ -74,7 +74,8 @@ const CardanoExplorer = () => {
   const acceptedDeepLinks = ["transaction", "block", "epoch", "address"];
   const query = useQuery();
   const path = useLocation().pathname.split("/").reverse()[0];
-  const isDeepLink = acceptedDeepLinks.includes(path);
+  const isKnownDeepLink = acceptedDeepLinks.includes(path);
+  const isDeepLink = path.length > 0;
   const deepLinkResolver = new DeepLinkResolver(path, query);
 
   const listOfExplorers = {
@@ -153,8 +154,8 @@ const CardanoExplorer = () => {
         >
           <StyledCard
             sx={{
-              opacity: isDeepLink && !explorer.isDeepLink ? 0.5 : 1,
-              boxShadow: isDeepLink && !explorer.isDeepLink ? 0 : 4,
+              opacity: isKnownDeepLink && !explorer.isDeepLink ? 0.5 : 1,
+              boxShadow: isKnownDeepLink && !explorer.isDeepLink ? 0 : 4,
             }}
           >
             <CardMedia
@@ -179,7 +180,7 @@ const CardanoExplorer = () => {
                 <Typography variant="h6" component="div">
                   {explorer.name}
                 </Typography>
-                {isDeepLink && (<Chip
+                {isKnownDeepLink && (<Chip
                   color={!explorer.isDeepLink ? "default" : "success"}
                   icon={<LinkIcon />}
                   label={
@@ -207,7 +208,7 @@ const CardanoExplorer = () => {
       <ContentSection>
         <Container maxWidth="lg">
           <Grid container spacing={3}>
-            {isDeepLink && (
+            {isKnownDeepLink && deepLinkResolver.isCorrectPathVariable() &&  (
               <Grid item xs={12}>
                 <Alert
                   severity={"info"}
@@ -220,6 +221,33 @@ const CardanoExplorer = () => {
                 </Alert>
               </Grid>
             )}
+            {isDeepLink && !isKnownDeepLink && (
+                <Grid item xs={12}>
+                  <Alert
+                      severity={"error"}
+                      sx={{
+                        borderRadius: "16px",
+                      }}
+                  >
+                    DeepLink "{path}" not matching any of the correct paths: {acceptedDeepLinks.join(", ")}.
+                    If this is a bug, please create an issue in Github.
+                  </Alert>
+                </Grid>
+            )}
+            {isDeepLink && isKnownDeepLink && !deepLinkResolver.isCorrectPathVariable() && (
+                <Grid item xs={12}>
+                  <Alert
+                      severity={"error"}
+                      sx={{
+                        borderRadius: "16px",
+                      }}
+                  >
+                    You need to set "{deepLinkResolver.getCorrectPathVariable()}" for Deeplink {path}.
+                    If this is a bug, please create an issue in Github.
+                  </Alert>
+                </Grid>
+                )
+            }
             <Grid item xs={12}>
               <Typography variant="h6" color={theme.palette.text.primary} gutterBottom>
                 Select the Explorer of your choice
