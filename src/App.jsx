@@ -229,7 +229,7 @@ const CardanoExplorer = () => {
                         borderRadius: "16px",
                       }}
                   >
-                    DeepLink "{path}" not known. Please use one of the following: {acceptedDeepLinks.join(", ")}.
+                    DeepLink "{path}" not matching any of the correct paths: {acceptedDeepLinks.join(", ")}.
                     If this is a bug, please create an issue in Github.
                   </Alert>
                 </Grid>
