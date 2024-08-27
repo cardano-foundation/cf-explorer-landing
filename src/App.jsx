@@ -143,7 +143,7 @@ const CardanoExplorer = () => {
   // sorting
   const sortedExplorers = Object.entries(listOfExplorers).sort((a,b) => 0.5 - Math.random());
   // having the deeplink explorers first
-  // sortedExplorers.sort(([, a], [, b]) => b.isDeepLink - a.isDeepLink);
+  sortedExplorers.sort(([, a], [, b]) => b.isDeepLink - a.isDeepLink);
 
   const selectedExplorer =
     listOfExplorers[path] || listOfExplorers[query.get("section")];
