@@ -61,8 +61,6 @@ const CardanoExplorer = () => {
     if (darkModePreference) {
       setIsDarkMode(darkModePreference === "true");
     }
-
-
   }, []);
 
   const theme = isDarkMode ? darkTheme : lightTheme;
@@ -140,9 +138,7 @@ const CardanoExplorer = () => {
     },
   };
 
-  // sorting
   const sortedExplorers = Object.entries(listOfExplorers).sort((a,b) => 0.5 - Math.random());
-  // having the deeplink explorers first
   if (isKnownDeepLink) {
     sortedExplorers.sort(([, a], [, b]) => b.isDeepLink - a.isDeepLink);
   }
