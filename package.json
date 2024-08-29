@@ -1,7 +1,9 @@
 {
   "name": "cf-explorer-landing",
   "version": "1.0.0",
-  "description": "",
+  "description": "Gateway to Cardano Explorers",
+  "repository": "https://github.com/cardano-foundation/cf-explorer-landing",
+  "author": "Cardano Foundation Engineering Team",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +11,6 @@
     "serve": "vite preview"
   },
   "keywords": [],
-  "author": "",
   "license": "Apache-2.0",
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
