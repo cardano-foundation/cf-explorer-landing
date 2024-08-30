@@ -1,18 +1,21 @@
 import React from "react";
 
 const screens = Object.freeze({
-  transaction: "transaction",
-  epoch: "epoch",
-  block: "block",
-});
+  transaction: 'transaction',
+  epoch: 'epoch',
+  block: 'block',
+})
 
 class DeepLinkResolver {
+
   constructor(path, query) {
-    this.mode = path.split("/").reverse()[0].replace(".html", "");
+    this.mode = path.split("/").reverse()[0].replace('.html','');
     this.query = query;
   }
 
-  getCExplorerLink(baseLink) {
+
+
+  getCExplorerLink (baseLink) {
     var link = baseLink;
     switch (this.mode) {
       case "epoch":

@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Container, Grid, Card, CardMedia, CardContent, Typography, Alert, styled, Stack, Chip } from "@mui/material";
+import {
+  Container,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
+  Alert,
+  styled,
+  Stack,
+  Chip,
+} from "@mui/material";
 import Header from "src/components/Header";
 import Footer from "src/components/Footer";
 import DeepLinkResolver from "src/common/DeepLinkResolver.jsx";
@@ -70,21 +81,24 @@ const CardanoExplorer = () => {
   const listOfExplorers = {
     cExplorer: {
       name: "Cexplorer.io",
-      description: "Ideal for those who need comprehensive data on Cardano's blockchain thanks to its robust analytical tools.",
+      description:
+        "Ideal for those who need comprehensive data on Cardano's blockchain thanks to its robust analytical tools.",
       image: cExplorerLogo,
       url: deepLinkResolver.getCExplorerLink("https://cexplorer.io/"),
       isDeepLink: true,
     },
     cardanoScan: {
       name: "Cardano Scan",
-      description: "Essential for users seeking detailed and reliable data on a feature rich explorer.",
+      description:
+        "Essential for users seeking detailed and reliable data on a feature rich explorer.",
       url: deepLinkResolver.getCardanoScanLink("https://cardanoscan.io/"),
       image: cardanoScanLogo,
       isDeepLink: true,
     },
     poolPM: {
       name: "Pool PM",
-      description: "Essential for NFT enthusiasts and creators who need to monitor and showcase their assets. Dynamic tool for visualizing NFTs. ",
+      description:
+        "Essential for NFT enthusiasts and creators who need to monitor and showcase their assets. Dynamic tool for visualizing NFTs. ",
       url: "https://pool.pm/",
       image: poolPmLogo,
       isDeepLink: false,
@@ -98,78 +112,96 @@ const CardanoExplorer = () => {
     },
     adaStat: {
       name: "AdaStat",
-      description: "Ideal for analysts and researcher who need to advanced statistical analyses and network monitoring.",
+      description:
+        "Ideal for analysts and researcher who need to advanced statistical analyses and network monitoring.",
       url: deepLinkResolver.getAdaStatLink("https://adastat.net/"),
       image: adaStatLogo,
       isDeepLink: true,
     },
     explorer: {
       name: "Explorer (Beta)",
-      description: "Focused on enterprises and policymakers. Currently under development, built by Cardano Foundation.",
-      url: deepLinkResolver.getCFBetaExplorerLink("https://beta.explorer.cardano.org/en/"),
+      description:
+        "Focused on enterprises and policymakers. Currently under development, built by Cardano Foundation.",
+      url: deepLinkResolver.getCFBetaExplorerLink(
+        "https://beta.explorer.cardano.org/en/"
+      ),
       image: betaExplorer,
       isDeepLink: true,
     },
     poolTool: {
       name: "PoolTool",
-      description: "Essential for those who need to make informed staking decisions. Provides data on the performance of pools. ",
+      description:
+        "Essential for those who need to make informed staking decisions. Provides data on the performance of pools. ",
       url: "https://pooltool.io/",
       image: poolTool,
       isDeepLink: false,
     },
   };
 
-  const sortedExplorers = Object.entries(listOfExplorers).sort((a, b) => 0.5 - Math.random());
+  const sortedExplorers = Object.entries(listOfExplorers).sort((a,b) => 0.5 - Math.random());
   if (isKnownDeepLink) {
     sortedExplorers.sort(([, a], [, b]) => b.isDeepLink - a.isDeepLink);
   }
 
-  const selectedExplorer = listOfExplorers[path] || listOfExplorers[query.get("section")];
+  const selectedExplorer =
+    listOfExplorers[path] || listOfExplorers[query.get("section")];
 
-  const explorerCards = sortedExplorers.map(([key, explorer]) => (
-    <Grid item xs={12} sm={6} md={4} key={key}>
-      <CardLink href={`${explorer.url}${query.get("value") || ""}`} target="_blank">
-        <StyledCard
-          sx={{
-            opacity: isKnownDeepLink && !explorer.isDeepLink ? 0.5 : 1,
-            boxShadow: isKnownDeepLink && !explorer.isDeepLink ? 0 : 4,
-          }}
+  const explorerCards = sortedExplorers.map(
+    ([key, explorer]) => (
+      <Grid item xs={12} sm={6} md={4} key={key}>
+        <CardLink
+          href={`${explorer.url}${query.get("value") || ""}`}
+          target="_blank"
         >
-          <CardMedia
-            component="img"
-            height="150"
-            image={explorer.image}
-            alt={explorer.name}
+          <StyledCard
             sx={{
-              width: "100%",
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-              position: "relative",
+              opacity: isKnownDeepLink && !explorer.isDeepLink ? 0.5 : 1,
+              boxShadow: isKnownDeepLink && !explorer.isDeepLink ? 0 : 4,
             }}
-          />
-          <CardContent>
-            <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
-              <Typography variant="h6" component="div">
-                {explorer.name}
-              </Typography>
-              {isKnownDeepLink && (
-                <Chip
+          >
+            <CardMedia
+              component="img"
+              height="150"
+              image={explorer.image}
+              alt={explorer.name}
+              sx={{
+                width: "100%",
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+                position: "relative",
+              }}
+            />
+            <CardContent>
+              <Stack
+                direction="row"
+                spacing={2}
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography variant="h6" component="div">
+                  {explorer.name}
+                </Typography>
+                {isKnownDeepLink && (<Chip
                   color={!explorer.isDeepLink ? "default" : "success"}
                   icon={<LinkIcon />}
-                  label={!explorer.isDeepLink ? "link not available" : "link available"}
+                  label={
+                    !explorer.isDeepLink
+                      ? "link not available"
+                      : "link available"
+                  }
                   size="small"
                   variant={!explorer.isDeepLink ? "outlined" : ""}
-                />
-              )}
-            </Stack>
-            <Typography variant="body1" color="text.secondary">
-              {explorer.description}
-            </Typography>
-          </CardContent>
-        </StyledCard>
-      </CardLink>
-    </Grid>
-  ));
+                />)}
+              </Stack>
+              <Typography variant="body1" color="text.secondary">
+                {explorer.description}
+              </Typography>
+            </CardContent>
+          </StyledCard>
+        </CardLink>
+      </Grid>
+    )
+  );
 
   return (
     <ThemeProvider theme={theme}>
@@ -177,7 +209,7 @@ const CardanoExplorer = () => {
       <ContentSection>
         <Container maxWidth="lg">
           <Grid container spacing={3}>
-            {isKnownDeepLink && deepLinkResolver.isCorrectPathVariable() && (
+            {isKnownDeepLink && deepLinkResolver.isCorrectPathVariable() &&  (
               <Grid item xs={12}>
                 <Alert
                   severity={"info"}
@@ -185,34 +217,38 @@ const CardanoExplorer = () => {
                     borderRadius: "16px",
                   }}
                 >
-                  You will be forwarded to {path} {deepLinkResolver.getValue()} after choosing your favorite Explorer
+                  You will be forwarded to {path} {deepLinkResolver.getValue()}{" "}
+                  after choosing your favorite Explorer
                 </Alert>
               </Grid>
             )}
             {isDeepLink && !isKnownDeepLink && (
-              <Grid item xs={12}>
-                <Alert
-                  severity={"error"}
-                  sx={{
-                    borderRadius: "16px",
-                  }}
-                >
-                  DeepLink "{path}" not matching any of the correct paths: {acceptedDeepLinks.join(", ")}. If this is a bug, please create an issue in Github.
-                </Alert>
-              </Grid>
+                <Grid item xs={12}>
+                  <Alert
+                      severity={"error"}
+                      sx={{
+                        borderRadius: "16px",
+                      }}
+                  >
+                    DeepLink "{path}" not matching any of the correct paths: {acceptedDeepLinks.join(", ")}.
+                    If this is a bug, please create an issue in Github.
+                  </Alert>
+                </Grid>
             )}
             {isDeepLink && isKnownDeepLink && !deepLinkResolver.isCorrectPathVariable() && (
-              <Grid item xs={12}>
-                <Alert
-                  severity={"error"}
-                  sx={{
-                    borderRadius: "16px",
-                  }}
-                >
-                  You need to set "{deepLinkResolver.getCorrectPathVariable()}" for Deeplink {path}. If this is a bug, please create an issue in Github.
-                </Alert>
-              </Grid>
-            )}
+                <Grid item xs={12}>
+                  <Alert
+                      severity={"error"}
+                      sx={{
+                        borderRadius: "16px",
+                      }}
+                  >
+                    You need to set "{deepLinkResolver.getCorrectPathVariable()}" for Deeplink {path}.
+                    If this is a bug, please create an issue in Github.
+                  </Alert>
+                </Grid>
+                )
+            }
             <Grid item xs={12}>
               <Typography variant="h6" color={theme.palette.text.primary} gutterBottom>
                 Select the Explorer of your choice
@@ -230,7 +266,12 @@ const CardanoExplorer = () => {
               >
                 {selectedExplorer ? (
                   <Grid item xs={12}>
-                    <CardLink href={`${selectedExplorer.baseLink}${query.get("value") || ""}`} target="_blank">
+                    <CardLink
+                      href={`${selectedExplorer.baseLink}${
+                        query.get("value") || ""
+                      }`}
+                      target="_blank"
+                    >
                       <StyledCard>
                         <CardContent>
                           <Typography variant="h6" component="div">
