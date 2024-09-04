@@ -72,6 +72,25 @@ class DeepLinkResolver {
     return link;
   }
 
+  getAdaStatLink(baseLink) {
+    var link = baseLink;
+    switch (this.mode) {
+      case "epoch":
+        link += `epochs/${this.getValue()}`;
+        break;
+      case "block":
+        link += `blocks/${this.getValue()}`;
+        break;
+      case "transaction":
+        link += `transactions/${this.getValue()}`;
+        break;
+      case "address":
+        link += `addresses/${this.getValue()}`;
+        break;
+    }
+    return link;
+  }
+
   getValue() {
     switch (this.mode) {
       case "epoch":

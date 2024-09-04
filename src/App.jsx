@@ -114,9 +114,9 @@ const CardanoExplorer = () => {
       name: "AdaStat",
       description:
         "Ideal for analysts and researcher who need to advanced statistical analyses and network monitoring.",
-      url: "https://adastat.net/",
+      url: deepLinkResolver.getAdaStatLink("https://adastat.net/"),
       image: adaStatLogo,
-      isDeepLink: false,
+      isDeepLink: true,
     },
     explorer: {
       name: "Explorer (Beta)",
