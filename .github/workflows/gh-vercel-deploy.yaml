@@ -30,7 +30,7 @@ jobs:
     - name: ⛮ Set vercel deploy metadata
       id: metadata
       run: |
-        if [ "${TRIGGERING_REF}" == "push" ]
+        if [ "${TRIGGERING_REF}" == "branch" ]
         then
           if [ "${BRANCH_NAME}" == "${PRODUCTION_BRANCH}" ]
           then
