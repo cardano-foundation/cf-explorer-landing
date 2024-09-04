@@ -7,20 +7,40 @@ on:
       - develop
   pull_request:
     types: [ opened, synchronize ]
+  workflow_dispatch:
+    inputs:
+      pull-request-number:
+        required: true
+        type: integer
+        default: ""
 
 env:
   PRODUCTION_BRANCH: main
 
 jobs:
   vercel-deploy:
+    if: "! github.event.pull_request.head.repo.fork"
     runs-on: ubuntu-latest
+    permissions: 
+      deployments: write
+      pull-requests: write
     steps:
     - name: Checkout
+      if: "${{ github.event.inputs.pull-request-number == '' }}"
       uses: actions/checkout@v4
       with:
         submodules: recursive  # Fetch private content
         fetch-depth: 1         # Fetch all history for .GitInfo and .Lastmod
         lfs: true
+
+    - name: Checkout workflow_dispatch input reference
+      if: "${{ github.event.inputs.pull-request-number != '' }}"
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive  # Fetch private content
+        fetch-depth: 1         # Fetch all history for .GitInfo and .Lastmod
+        lfs: true
+        ref: "refs/pull/${{ github.event.inputs.pull-request-number }}/merge"
 
     - name: ⛮ cf-gha-baseline
       uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
@@ -30,16 +50,24 @@ jobs:
     - name: ⛮ Set vercel deploy metadata
       id: metadata
       run: |
-        if [ "${TRIGGERING_REF}" == "branch" ]
+        if [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]
         then
-          if [ "${BRANCH_NAME}" == "${PRODUCTION_BRANCH}" ]
-          then
-            echo "VERCEL_ARGS=--prod" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
-          fi
-          echo "DEPLOY_NAME=BRANCH-${BRANCH_NAME}" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
-        elif [ "${TRIGGERING_REF}" == "pr" ]
-        then
+          PR_NUMBER=${{ github.event.inputs.pull-request-number }}
+          echo "PR_NUMBER=${PR_NUMBER}" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
           echo "DEPLOY_NAME=PR-${PR_NUMBER}" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
+        else
+          if [ "${TRIGGERING_REF}" == "branch" ]
+          then
+            if [ "${BRANCH_NAME}" == "${PRODUCTION_BRANCH}" ]
+            then
+              echo "VERCEL_ARGS=--prod" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
+            fi
+            echo "DEPLOY_NAME=BRANCH-${BRANCH_NAME}" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
+          elif [ "${TRIGGERING_REF}" == "pr" ]
+          then
+            echo "PR_NUMBER=${PR_NUMBER}" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
+            echo "DEPLOY_NAME=PR-${PR_NUMBER}" | tee -a "$GITHUB_ENV" | tee -a "${GITHUB_OUTPUT}"
+          fi
         fi
 
     - name: Start Deployment
@@ -91,9 +119,10 @@ jobs:
 
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v1
-      if: ${{ github.event_name == 'pull_request' }}
+      if: ${{ (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch') }}
       with:
         message: 'Vercel PR (merge commit) deploy URL: ${{ steps.vercel-action.outputs.preview-url }}'
+        pr_number: ${{ steps.metadata.outputs.PR_NUMBER }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Update Deployment Status
