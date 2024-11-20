@@ -80,7 +80,7 @@ function Header({ toggleTheme, isDarkMode }) {
             Explorers
           </Typography>
           <Typography variant="subtitle1" gutterBottom>
-            List of Cardano Explorers from our Community and Foundation.
+            List of Cardano Explorers built by the community for the community.
           </Typography>
         </Box>
       </HeaderSection>
