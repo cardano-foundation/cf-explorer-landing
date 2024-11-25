@@ -13,6 +13,14 @@ Cardano Explorer Landing Page, a simple web application showcasing major Cardano
 - [Installation](#installation)
 - [Project Structure](#project-structure)
 
+## Deeplinks - How to use them
+This landing page supports DeepLinks to be able to forward to your favorite explorer.
+Deeplinks are available for the following endpoints:
+- `Epoch` - URL `explorer.cardano.org/epoch?number={EPOCH_NUMBER}`
+- `Block` - URL `explorer.cardano.org/block?id={BLOCK_NUMBER}`
+- `Transaction` - URL `explorer.cardano.org/transaction?id={TRANSACTION_ID}`
+- `Address` - URL `explorer.cardano.org/address?address={ADDRESS}`
+
 ## Installation
 
 To set up the project locally, follow these steps:
