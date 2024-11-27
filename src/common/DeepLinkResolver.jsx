@@ -13,8 +13,6 @@ class DeepLinkResolver {
     this.query = query;
   }
 
-
-
   getCExplorerLink (baseLink) {
     var link = baseLink;
     switch (this.mode) {
@@ -42,25 +40,6 @@ class DeepLinkResolver {
         break;
       case "block":
         link += `search?filter=blocks&value=/${this.getValue()}`;
-        break;
-      case "transaction":
-        link += `transaction/${this.getValue()}`;
-        break;
-      case "address":
-        link += `address/${this.getValue()}`;
-        break;
-    }
-    return link;
-  }
-
-  getCFBetaExplorerLink(baseLink) {
-    var link = baseLink;
-    switch (this.mode) {
-      case "epoch":
-        link += `epoch/${this.getValue()}`;
-        break;
-      case "block":
-        link += `block/${this.getValue()}`;
         break;
       case "transaction":
         link += `transaction/${this.getValue()}`;

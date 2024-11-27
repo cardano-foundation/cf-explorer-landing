@@ -118,16 +118,6 @@ const CardanoExplorer = () => {
       image: adaStatLogo,
       isDeepLink: true,
     },
-    explorer: {
-      name: "Explorer (Beta)",
-      description:
-        "Focused on enterprises and policymakers. Currently under development, built by Cardano Foundation.",
-      url: deepLinkResolver.getCFBetaExplorerLink(
-        "https://beta.explorer.cardano.org/en/"
-      ),
-      image: betaExplorer,
-      isDeepLink: true,
-    },
     poolTool: {
       name: "PoolTool",
       description:
