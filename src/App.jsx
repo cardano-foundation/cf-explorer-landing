@@ -73,7 +73,7 @@ const CardanoExplorer = () => {
 
   const query = useQuery();
   const path = useLocation().pathname;
-  const isDeepLink = path.length > 0;
+  const isDeepLink = path.replace("/", "").length > 0;
   const deepLinkResolver = new DeepLinkResolver(path, query);
 
   const listOfExplorers = {
