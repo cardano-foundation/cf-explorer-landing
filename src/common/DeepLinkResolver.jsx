@@ -7,10 +7,39 @@ const screens = Object.freeze({
 })
 
 class DeepLinkResolver {
+  acceptedDeepLinks = ["transaction", "block", "epoch", "address", "tx"];
+
 
   constructor(path, query) {
-    this.mode = path.split("/").reverse()[0].replace('.html','');
-    this.query = query;
+    // handling two different options (example for transaction): /tx?id=1234 or /tx/1234
+    let pathSplit = path.split("/");
+    if(pathSplit[0].length === 0) {
+        pathSplit.shift();
+    }
+    this.mode = pathSplit[0] === "tx" ? "transaction" : pathSplit[0];
+
+    // if the path is /tx?id=1234, we need to split the path and get the id from the query
+    // if the path is /tx/1234, we need to split the path and get the id from the path
+    if(pathSplit.length > 1) {
+      this.query = new Map();
+      switch (this.mode) {
+        case "epoch":
+          this.query.set("number", pathSplit[1]);
+          break;
+        case "block":
+          this.query.set("id", pathSplit[1]);
+          break;
+        case "transaction":
+          this.query.set("id", pathSplit[1]);
+          break;
+        case "address":
+          this.query.set("address", pathSplit[1]);
+          break;
+      }
+    } else {
+      this.query = query;
+    }
+
   }
 
   getCExplorerLink (baseLink) {
@@ -107,6 +136,10 @@ class DeepLinkResolver {
       case "address":
         return "address";
     }
+  }
+
+  isKnownDeeplink() {
+    return this.acceptedDeepLinks.includes(this.mode);
   }
 }
 
