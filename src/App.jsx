@@ -71,11 +71,9 @@ const CardanoExplorer = () => {
     localStorage.setItem("darkMode", newDarkMode);
   };
 
-  const acceptedDeepLinks = ["transaction", "block", "epoch", "address"];
   const query = useQuery();
-  const path = useLocation().pathname.split("/").reverse()[0];
-  const isKnownDeepLink = acceptedDeepLinks.includes(path);
-  const isDeepLink = path.length > 0;
+  const path = useLocation().pathname;
+  const isDeepLink = path.replace("/", "").length > 0;
   const deepLinkResolver = new DeepLinkResolver(path, query);
 
   const listOfExplorers = {
@@ -129,7 +127,7 @@ const CardanoExplorer = () => {
   };
 
   const sortedExplorers = Object.entries(listOfExplorers).sort((a,b) => 0.5 - Math.random());
-  if (isKnownDeepLink) {
+  if (deepLinkResolver.isKnownDeeplink()) {
     sortedExplorers.sort(([, a], [, b]) => b.isDeepLink - a.isDeepLink);
   }
 
@@ -145,8 +143,8 @@ const CardanoExplorer = () => {
         >
           <StyledCard
             sx={{
-              opacity: isKnownDeepLink && !explorer.isDeepLink ? 0.5 : 1,
-              boxShadow: isKnownDeepLink && !explorer.isDeepLink ? 0 : 4,
+              opacity: deepLinkResolver.isKnownDeeplink() && !explorer.isDeepLink ? 0.5 : 1,
+              boxShadow: deepLinkResolver.isKnownDeeplink() && !explorer.isDeepLink ? 0 : 4,
             }}
           >
             <CardMedia
@@ -171,7 +169,7 @@ const CardanoExplorer = () => {
                 <Typography variant="h6" component="div">
                   {explorer.name}
                 </Typography>
-                {isKnownDeepLink && (<Chip
+                {deepLinkResolver.isKnownDeeplink() && (<Chip
                   color={!explorer.isDeepLink ? "default" : "success"}
                   icon={<LinkIcon />}
                   label={
@@ -199,7 +197,7 @@ const CardanoExplorer = () => {
       <ContentSection>
         <Container maxWidth="lg">
           <Grid container spacing={3}>
-            {isKnownDeepLink && deepLinkResolver.isCorrectPathVariable() &&  (
+            {deepLinkResolver.isKnownDeeplink() && deepLinkResolver.isCorrectPathVariable() &&  (
               <Grid item xs={12}>
                 <Alert
                   severity={"info"}
@@ -207,12 +205,12 @@ const CardanoExplorer = () => {
                     borderRadius: "16px",
                   }}
                 >
-                  You will be forwarded to {path} {deepLinkResolver.getValue()}{" "}
+                  You will be forwarded to {deepLinkResolver.mode} {deepLinkResolver.getValue()}{" "}
                   after choosing your favorite Explorer
                 </Alert>
               </Grid>
             )}
-            {isDeepLink && !isKnownDeepLink && (
+            {isDeepLink && !deepLinkResolver.isKnownDeeplink() && (
                 <Grid item xs={12}>
                   <Alert
                       severity={"error"}
@@ -220,12 +218,12 @@ const CardanoExplorer = () => {
                         borderRadius: "16px",
                       }}
                   >
-                    DeepLink "{path}" not matching any of the correct paths: {acceptedDeepLinks.join(", ")}.
+                    DeepLink "{path}" not matching any of the correct paths: {deepLinkResolver.acceptedDeepLinks.join(", ")}.
                     If this is a bug, please create an issue in Github.
                   </Alert>
                 </Grid>
             )}
-            {isDeepLink && isKnownDeepLink && !deepLinkResolver.isCorrectPathVariable() && (
+            {isDeepLink && deepLinkResolver.isKnownDeeplink() && !deepLinkResolver.isCorrectPathVariable() && (
                 <Grid item xs={12}>
                   <Alert
                       severity={"error"}
