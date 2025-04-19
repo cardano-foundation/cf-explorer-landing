@@ -210,7 +210,7 @@ const CardanoExplorer = () => {
                     borderRadius: "16px",
                   }}
                 >
-                  You will be forwarded to {deepLinkResolver.mode} {deepLinkResolver.getValue()}{" "}
+                  You will be forwarded to <strong>{deepLinkResolver.mode} {deepLinkResolver.getValue()}{" "}</strong>
                   after choosing your favorite Explorer
                 </Alert>
               </Grid>
@@ -223,7 +223,7 @@ const CardanoExplorer = () => {
                         borderRadius: "16px",
                       }}
                   >
-                    You are using the <strong>{deepLinkResolver.network}</strong> network. You can choose an explorer that supports this network.
+                    You will be forwarded to the <strong>{deepLinkResolver.network}</strong> network explorer.
                   </Alert>
                 </Grid>
             )}
