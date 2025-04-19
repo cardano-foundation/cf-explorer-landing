@@ -215,6 +215,18 @@ const CardanoExplorer = () => {
                 </Alert>
               </Grid>
             )}
+            {deepLinkResolver.network !== null && (
+                <Grid item xs={12}>
+                  <Alert
+                      severity={"info"}
+                      sx={{
+                        borderRadius: "16px",
+                      }}
+                  >
+                    You are using the <strong>{deepLinkResolver.network}</strong> network. You can choose an explorer that supports this network.
+                  </Alert>
+                </Grid>
+            )}
 
             {isDeepLink && !deepLinkResolver.isKnownDeeplink() && (
                 <Grid item xs={12}>
