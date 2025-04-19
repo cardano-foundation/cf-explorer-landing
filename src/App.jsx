@@ -132,6 +132,7 @@ const CardanoExplorer = () => {
   };
 
   const sortedExplorers = Object.entries(listOfExplorers).sort((a,b) => 0.5 - Math.random());
+  // sorting explorers based on if they are deeplink capable and if they support the requested network
   if (deepLinkResolver.isKnownDeeplink() || deepLinkResolver.network !== null) {
     sortedExplorers.sort(([, a], [, b]) => (b.isDeepLink && deepLinkResolver.canHandleNetwork(b.networks)) - (a.isDeepLink && deepLinkResolver.canHandleNetwork(a.networks)));
   }
@@ -148,6 +149,7 @@ const CardanoExplorer = () => {
         >
           <StyledCard
             sx={{
+              // blurring explorer which can't handle the requested network and are not deeplink capable
               opacity: (deepLinkResolver.isKnownDeeplink() && !explorer.isDeepLink) || !deepLinkResolver.canHandleNetwork(explorer.networks) ? 0.5 : 1,
               boxShadow: (deepLinkResolver.isKnownDeeplink() && !explorer.isDeepLink) || !deepLinkResolver.canHandleNetwork(explorer.networks) ? 0 : 4,
             }}
