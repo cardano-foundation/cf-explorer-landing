@@ -151,7 +151,6 @@ class DeepLinkResolver {
   }
 
   canHandleNetwork(networks) {
-    console.log(this.network);
     return this.network === null || networks.includes(this.network);
   }
 }
