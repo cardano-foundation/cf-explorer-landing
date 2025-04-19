@@ -39,11 +39,15 @@ class DeepLinkResolver {
     } else {
       this.query = query;
     }
-
+    this.network = this.query.get("network");
   }
 
   getCExplorerLink (baseLink) {
-    var link = baseLink;
+    const networks = {
+      preprod: "preprod.",
+      preview: "preview."
+    }
+    var link = baseLink.replace("https://", "https://" + networks[this.network] || "");
     switch (this.mode) {
       case "epoch":
         link += `epoch/${this.getValue()}`;
@@ -62,7 +66,11 @@ class DeepLinkResolver {
   }
 
   getCardanoScanLink(baseLink) {
-    var link = baseLink;
+    const networks = {
+      preprod: "preprod.",
+      preview: "preview."
+    }
+    var link = baseLink.replace("https://", "https://" + networks[this.network] || "");
     switch (this.mode) {
       case "epoch":
         link += `epoch/${this.getValue()}`;
@@ -140,6 +148,11 @@ class DeepLinkResolver {
 
   isKnownDeeplink() {
     return this.acceptedDeepLinks.includes(this.mode);
+  }
+
+  canHandleNetwork(networks) {
+    console.log(this.network);
+    return this.network === null || networks.includes(this.network);
   }
 }
 

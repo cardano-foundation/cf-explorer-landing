@@ -20,7 +20,6 @@ import cardanoScanLogo from "/assets/cardano-scan.png";
 import poolPmLogo from "/assets/pool-pm.png";
 import eutxoLogo from "/assets/eutxo.png";
 import adaStatLogo from "/assets/adastat.png";
-import betaExplorer from "/assets/beta-explorer.png";
 import poolTool from "/assets/pool-tool.png";
 import LinkIcon from "@mui/icons-material/Link";
 
@@ -84,6 +83,7 @@ const CardanoExplorer = () => {
       image: cExplorerLogo,
       url: deepLinkResolver.getCExplorerLink("https://cexplorer.io/"),
       isDeepLink: true,
+      networks: ["preprod", "preview"]
     },
     cardanoScan: {
       name: "Cardano Scan",
@@ -92,6 +92,7 @@ const CardanoExplorer = () => {
       url: deepLinkResolver.getCardanoScanLink("https://cardanoscan.io/"),
       image: cardanoScanLogo,
       isDeepLink: true,
+      networks: ["preprod", "preview"]
     },
     poolPM: {
       name: "Pool PM",
@@ -100,6 +101,7 @@ const CardanoExplorer = () => {
       url: "https://pool.pm/",
       image: poolPmLogo,
       isDeepLink: false,
+      networks: []
     },
     eUTxO: {
       name: "eUTxO",
@@ -107,6 +109,7 @@ const CardanoExplorer = () => {
       url: "https://eutxo.org/",
       image: eutxoLogo,
       isDeepLink: false,
+      networks: []
     },
     adaStat: {
       name: "AdaStat",
@@ -115,6 +118,7 @@ const CardanoExplorer = () => {
       url: deepLinkResolver.getAdaStatLink("https://adastat.net/"),
       image: adaStatLogo,
       isDeepLink: true,
+      networks: [] // Preprod and preview currently in progress
     },
     poolTool: {
       name: "PoolTool",
@@ -123,12 +127,13 @@ const CardanoExplorer = () => {
       url: "https://pooltool.io/",
       image: poolTool,
       isDeepLink: false,
+      networks: []
     },
   };
 
   const sortedExplorers = Object.entries(listOfExplorers).sort((a,b) => 0.5 - Math.random());
-  if (deepLinkResolver.isKnownDeeplink()) {
-    sortedExplorers.sort(([, a], [, b]) => b.isDeepLink - a.isDeepLink);
+  if (deepLinkResolver.isKnownDeeplink() || deepLinkResolver.network !== null) {
+    sortedExplorers.sort(([, a], [, b]) => (b.isDeepLink && deepLinkResolver.canHandleNetwork(b.networks)) - (a.isDeepLink && deepLinkResolver.canHandleNetwork(a.networks)));
   }
 
   const selectedExplorer =
@@ -143,8 +148,8 @@ const CardanoExplorer = () => {
         >
           <StyledCard
             sx={{
-              opacity: deepLinkResolver.isKnownDeeplink() && !explorer.isDeepLink ? 0.5 : 1,
-              boxShadow: deepLinkResolver.isKnownDeeplink() && !explorer.isDeepLink ? 0 : 4,
+              opacity: (deepLinkResolver.isKnownDeeplink() && !explorer.isDeepLink) || !deepLinkResolver.canHandleNetwork(explorer.networks) ? 0.5 : 1,
+              boxShadow: (deepLinkResolver.isKnownDeeplink() && !explorer.isDeepLink) || !deepLinkResolver.canHandleNetwork(explorer.networks) ? 0 : 4,
             }}
           >
             <CardMedia
@@ -170,10 +175,10 @@ const CardanoExplorer = () => {
                   {explorer.name}
                 </Typography>
                 {deepLinkResolver.isKnownDeeplink() && (<Chip
-                  color={!explorer.isDeepLink ? "default" : "success"}
+                  color={!explorer.isDeepLink || !deepLinkResolver.canHandleNetwork(explorer.networks) ? "default" : "success"}
                   icon={<LinkIcon />}
                   label={
-                    !explorer.isDeepLink
+                    !explorer.isDeepLink || !deepLinkResolver.canHandleNetwork(explorer.networks)
                       ? "link not available"
                       : "link available"
                   }
@@ -210,6 +215,7 @@ const CardanoExplorer = () => {
                 </Alert>
               </Grid>
             )}
+
             {isDeepLink && !deepLinkResolver.isKnownDeeplink() && (
                 <Grid item xs={12}>
                   <Alert
