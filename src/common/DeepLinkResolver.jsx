@@ -8,32 +8,38 @@ const screens = Object.freeze({
 
 class DeepLinkResolver {
   acceptedDeepLinks = ["transaction", "block", "epoch", "address", "tx"];
+  acceptedNetworks = ["mainnet", "preprod", "preview"];
 
 
   constructor(path, query) {
     // handling two different options (example for transaction): /tx?id=1234 or /tx/1234
     let pathSplit = path.split("/");
-    if(pathSplit[0].length === 0) {
+
+    // finding the right index to avoid prefixes like /en/ - we don't support them, so we are ignoring them
+    let index = pathSplit.findIndex((item) => {
+        return this.acceptedDeepLinks.includes(item);
+    });
+
+    if(pathSplit[index].length === 0) {
         pathSplit.shift();
     }
-    this.mode = pathSplit[0] === "tx" ? "transaction" : pathSplit[0];
-
+    this.mode = pathSplit[index] === "tx" ? "transaction" : pathSplit[index];
     // if the path is /tx?id=1234, we need to split the path and get the id from the query
     // if the path is /tx/1234, we need to split the path and get the id from the path
-    if(pathSplit.length > 1) {
+    if(query.size === 0 || query.size === 1 && query.has("network")) {
       this.query = new Map();
       switch (this.mode) {
         case "epoch":
-          this.query.set("number", pathSplit[1]);
+          this.query.set("number", pathSplit[pathSplit.length - 1]);
           break;
         case "block":
-          this.query.set("id", pathSplit[1]);
+          this.query.set("id", pathSplit[pathSplit.length - 1]);
           break;
         case "transaction":
-          this.query.set("id", pathSplit[1]);
+          this.query.set("id", pathSplit[pathSplit.length - 1]);
           break;
         case "address":
-          this.query.set("address", pathSplit[1]);
+          this.query.set("address", pathSplit[pathSplit.length - 1]);
           break;
       }
     } else {
@@ -47,7 +53,8 @@ class DeepLinkResolver {
       preprod: "preprod.",
       preview: "preview."
     }
-    var link = baseLink.replace("https://", "https://" + networks[this.network] || "");
+
+    var link = baseLink.replace("https://", "https://" + (networks[this.network] || ""));
     switch (this.mode) {
       case "epoch":
         link += `epoch/${this.getValue()}`;
@@ -70,7 +77,7 @@ class DeepLinkResolver {
       preprod: "preprod.",
       preview: "preview."
     }
-    var link = baseLink.replace("https://", "https://" + networks[this.network] || "");
+    var link = baseLink.replace("https://", "https://" + (networks[this.network] || ""));
     switch (this.mode) {
       case "epoch":
         link += `epoch/${this.getValue()}`;
@@ -151,7 +158,7 @@ class DeepLinkResolver {
   }
 
   canHandleNetwork(networks) {
-    return this.network === null || networks.includes(this.network);
+    return this.network === undefined || this.network === null || networks.includes(this.network);
   }
 }
 
