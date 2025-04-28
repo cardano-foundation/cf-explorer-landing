@@ -20,9 +20,6 @@ class DeepLinkResolver {
         return this.acceptedDeepLinks.includes(item);
     });
 
-    if(pathSplit[index].length === 0) {
-        pathSplit.shift();
-    }
     this.mode = pathSplit[index] === "tx" ? "transaction" : pathSplit[index];
     // if the path is /tx?id=1234, we need to split the path and get the id from the query
     // if the path is /tx/1234, we need to split the path and get the id from the path
@@ -41,6 +38,8 @@ class DeepLinkResolver {
         case "address":
           this.query.set("address", pathSplit[pathSplit.length - 1]);
           break;
+        default:
+          console.log("Unknown mode: " + this.mode);
       }
     } else {
       this.query = query;
@@ -166,6 +165,11 @@ class DeepLinkResolver {
 
   canHandleNetwork(networks) {
     return this.network === undefined || this.network === null || networks.includes(this.network);
+  }
+
+  isDeepLink(path) {
+    const filteredPath = path.replace("/", "");
+    return filteredPath.length > 0 && !this.acceptedNetworks.includes(filteredPath);
   }
 }
 

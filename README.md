@@ -21,10 +21,10 @@ Deeplinks are available for the following endpoints:
 - `Transaction` - URL `explorer.cardano.org/transaction?id={TRANSACTION_ID}` or `explorer.cardano.org/transaction/{TRANSACTION_ID}`
 - `Address` - URL `explorer.cardano.org/address?address={ADDRESS}` or `explorer.cardano.org/address/{ADDRESS}`
 
-Additionally, to the above functions it is possible to specify which network to use. This can be done by adding a query parameter `network` to the URL. The following networks are supported:
+Additionally, to the above functions it is possible to specify which network to use. The following networks are supported:
 - `mainnet` - Default network, no need to specify
-- `preprod` - `explorer.cardano.org/?network=preprod`
-- `preview` - `explorer.cardano.org/?network=preview`
+- `preprod` - `explorer.cardano.org/?network=preprod` or `explorer.cardano.org/preprod`
+- `preview` - `explorer.cardano.org/?network=preview` or `explorer.cardano.org/preview`
 
 A full example for a transaction would be:
 `explorer.cardano.org/transaction?id=1234567890&network=preprod`
