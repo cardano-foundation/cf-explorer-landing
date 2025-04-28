@@ -72,8 +72,8 @@ const CardanoExplorer = () => {
 
   const query = useQuery();
   const path = useLocation().pathname;
-  const isDeepLink = path.replace("/", "").length > 0;
   const deepLinkResolver = new DeepLinkResolver(path, query);
+  const isDeepLink = deepLinkResolver.isDeepLink(path);
 
   const listOfExplorers = {
     cExplorer: {
@@ -217,7 +217,7 @@ const CardanoExplorer = () => {
                 </Alert>
               </Grid>
             )}
-            {deepLinkResolver.network !== null && (
+            {(deepLinkResolver.network !== undefined) && (
                 <Grid item xs={12}>
                   <Alert
                       severity={"info"}
