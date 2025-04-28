@@ -8,7 +8,7 @@ const screens = Object.freeze({
 
 class DeepLinkResolver {
   acceptedDeepLinks = ["transaction", "block", "epoch", "address", "tx"];
-  acceptedNetworks = ["mainnet", "preprod", "preview"];
+  acceptedNetworks = ["preprod", "preview"]; // mainnet is default
 
 
   constructor(path, query) {
@@ -45,7 +45,14 @@ class DeepLinkResolver {
     } else {
       this.query = query;
     }
-    this.network = this.query.get("network");
+    // Network can be set like ?network=preprod or /preprod/tx?id=1234
+    if(query.has("network")) {
+      this.network = query.get("network");
+    }
+    let findIndex = pathSplit.findIndex((item => this.acceptedNetworks.includes(item)));
+    if(findIndex !== -1) {
+      this.network = pathSplit[findIndex];
+    }
   }
 
   getCExplorerLink (baseLink) {
