@@ -217,7 +217,7 @@ const CardanoExplorer = () => {
                 </Alert>
               </Grid>
             )}
-            {deepLinkResolver.network !== null && (
+            {(deepLinkResolver.network !== undefined) && (
                 <Grid item xs={12}>
                   <Alert
                       severity={"info"}
