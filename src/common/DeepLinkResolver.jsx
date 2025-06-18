@@ -1,3 +1,4 @@
+import { bech32 } from "bech32";
 import React from "react";
 
 const screens = Object.freeze({
@@ -7,7 +8,7 @@ const screens = Object.freeze({
 })
 
 class DeepLinkResolver {
-  acceptedDeepLinks = ["transaction", "block", "epoch", "address", "tx"];
+  acceptedDeepLinks = ["transaction", "block", "epoch", "address", "tx", "governance-action"];
   acceptedNetworks = ["preprod", "preview"]; // mainnet is default
 
 
@@ -37,6 +38,9 @@ class DeepLinkResolver {
           break;
         case "address":
           this.query.set("address", pathSplit[pathSplit.length - 1]);
+          break;
+        case "governance-action":
+          this.query.set("governance-action", pathSplit[pathSplit.length - 1]);
           break;
         default:
           console.log("Unknown mode: " + this.mode);
@@ -74,6 +78,8 @@ class DeepLinkResolver {
       case "address":
         link += `address/${this.getValue()}`;
         break;
+      case "governance-action":
+        return null;
     }
     return link;
   }
@@ -97,6 +103,9 @@ class DeepLinkResolver {
       case "address":
         link += `address/${this.getValue()}`;
         break;
+      case "governance-action":
+        link += `govAction/${this.getValue()}`;
+        break;
     }
     return link;
   }
@@ -116,6 +125,9 @@ class DeepLinkResolver {
       case "address":
         link += `addresses/${this.getValue()}`;
         break;
+      case "governance-action":
+        link += `governances/${this.getValue()}`;
+        break;
     }
     return link;
   }
@@ -130,6 +142,17 @@ class DeepLinkResolver {
         return this.query.get("id");
       case "address":
         return this.query.get("address");
+      case "governance-action":
+        // NOTE: If the argument is provided as a bech32-encoded string, we convert it to hexadecimal because
+        // not all explorers handle well gov id as bech32 string, but those who handle gov action handles them
+        // fine in hexadecimal/base16.
+        const value = this.query.get("governance-action");
+        if (value.startsWith(`gov_action1`)) {
+          const words = bech32.fromWords(bech32.decode(value, 999).words);
+          return words.map(word => word.toString(16).padStart(2, "0")).join("");
+        } else {
+          return value;
+        }
     }
   }
 
@@ -143,6 +166,8 @@ class DeepLinkResolver {
         return this.query.has("id");
       case "address":
         return this.query.has("address");
+      case "governance-action":
+        return this.query.has("governance-action");
     }
   }
 
@@ -156,6 +181,23 @@ class DeepLinkResolver {
         return "id";
       case "address":
         return "address";
+      case "governance-action":
+        return "governance-action";
+    }
+  }
+
+  getHumanReadableMode() {
+    switch (this.mode) {
+      case "epoch":
+        return "epoch";
+      case "block":
+        return "block";
+      case "transaction":
+        return "transaction";
+      case "address":
+        return "address";
+      case "governance-action":
+        return "governance action";
     }
   }
 
