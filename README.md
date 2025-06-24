@@ -20,6 +20,7 @@ Deeplinks are available for the following endpoints:
 - `Block` - URL `explorer.cardano.org/block?id={BLOCK_NUMBER}` or `explorer.cardano.org/block/{BLOCK_NUMBER}`
 - `Transaction` - URL `explorer.cardano.org/transaction?id={TRANSACTION_ID}` or `explorer.cardano.org/transaction/{TRANSACTION_ID}`
 - `Address` - URL `explorer.cardano.org/address?address={ADDRESS}` or `explorer.cardano.org/address/{ADDRESS}`
+- `governance-action` - URL `explorer.cardano.org/governance-action?id={GOVERNANCE_ACTION_ID}` or `explorer.cardano.org/governance-action/{GOVERNANCE_ACTION_ID}`
 
 Additionally, to the above functions it is possible to specify which network to use. The following networks are supported:
 - `mainnet` - Default network, no need to specify
