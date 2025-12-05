@@ -1,6 +1,6 @@
 // src/components/Header.jsx
 import React from "react";
-import { Box, Typography, styled, IconButton, Stack } from "@mui/material";
+import { Box, Typography, styled, IconButton, Stack, Chip } from "@mui/material";
 import cardanoLogoBlue from "/assets/logo.svg";
 import cardanoLogoWhite from "/assets/logo-white.svg";
 import { LightMode, DarkMode, GitHub } from "@mui/icons-material";
@@ -24,6 +24,10 @@ export const HeaderSection = styled("header")`
 
 function Header({ toggleTheme, isDarkMode }) {
   const theme = isDarkMode ? darkTheme : lightTheme;
+  const path = window.location.pathname;
+  const currentNetwork = path.startsWith("/preprod") ? "preprod"
+                       : path.startsWith("/preview") ? "preview"
+                       : "mainnet";
   return (
     <>
       <Box
@@ -82,6 +86,20 @@ function Header({ toggleTheme, isDarkMode }) {
           <Typography variant="subtitle1" gutterBottom>
             List of Cardano Explorers built by the community for the community.
           </Typography>
+          <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
+            <Chip label="Mainnet" size="small" component="a" href="/"
+                  variant="outlined"
+                  sx={{ color: "#fff", borderColor: "#fff", cursor: "pointer",
+                        backgroundColor: currentNetwork === "mainnet" ? "rgba(255,255,255,0.2)" : "transparent" }} />
+            <Chip label="Preprod" size="small" component="a" href="/preprod"
+                  variant="outlined"
+                  sx={{ color: "#fff", borderColor: "#fff", cursor: "pointer",
+                        backgroundColor: currentNetwork === "preprod" ? "rgba(255,255,255,0.2)" : "transparent" }} />
+            <Chip label="Preview" size="small" component="a" href="/preview"
+                  variant="outlined"
+                  sx={{ color: "#fff", borderColor: "#fff", cursor: "pointer",
+                        backgroundColor: currentNetwork === "preview" ? "rgba(255,255,255,0.2)" : "transparent" }} />
+          </Box>
         </Box>
       </HeaderSection>
     </>
