@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Checkbox, FormControlLabel } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import {
   Container,
@@ -133,14 +134,47 @@ const CardanoExplorer = () => {
     },
   };
 
+
+
   const sortedExplorers = Object.entries(listOfExplorers).sort((a,b) => 0.5 - Math.random());
   // sorting explorers based on if they are deeplink capable and if they support the requested network
   if (deepLinkResolver.isKnownDeeplink() || deepLinkResolver.network !== null) {
     sortedExplorers.sort(([, a], [, b]) => (b.isDeepLink && deepLinkResolver.canHandleNetwork(b.networks)) - (a.isDeepLink && deepLinkResolver.canHandleNetwork(a.networks)));
   }
 
+  // Auto-select and redirect if user has a preference for this deeplink type and network
+  useEffect(() => {
+    // If not a known deeplink, remove all explorer preferences so user can reset
+    if (!deepLinkResolver.isKnownDeeplink()) {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith('explorer_pref_'))
+        .forEach((k) => localStorage.removeItem(k));
+      return;
+    }
+    // Otherwise, auto-redirect if preference exists
+    const prefKey = `explorer_pref_${deepLinkResolver.mode}_${deepLinkResolver.network || 'mainnet'}`;
+    const preferred = localStorage.getItem(prefKey);
+    if (preferred && listOfExplorers[preferred]) {
+      const explorer = listOfExplorers[preferred];
+      if (explorer.isDeepLink && deepLinkResolver.canHandleNetwork(explorer.networks)) {
+        window.location.href = `${explorer.url}${query.get("value") || ""}`;
+      }
+    }
+  }, [deepLinkResolver.mode, deepLinkResolver.network]);
+
   const selectedExplorer =
     listOfExplorers[path] || listOfExplorers[query.get("section")];
+
+
+  const [storePreference, setStorePreference] = useState(false);
+
+  const handleExplorerClick = (key, explorer) => {
+    // Only store if user checked the box
+    if (storePreference && deepLinkResolver.isKnownDeeplink()) {
+      const prefKey = `explorer_pref_${deepLinkResolver.mode}_${deepLinkResolver.network || 'mainnet'}`;
+      localStorage.setItem(prefKey, key);
+    }
+  };
 
   const explorerCards = sortedExplorers.map(
     ([key, explorer]) => (
@@ -148,6 +182,7 @@ const CardanoExplorer = () => {
         <CardLink
           href={`${explorer.url}${query.get("value") || ""}`}
           target="_blank"
+          onClick={() => handleExplorerClick(key, explorer)}
         >
           <StyledCard
             sx={{
@@ -260,9 +295,45 @@ const CardanoExplorer = () => {
                 )
             }
             <Grid item xs={12}>
-              <Typography variant="h6" color={theme.palette.text.primary} gutterBottom>
-                Select the Explorer of your choice
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Typography variant="h6" color={theme.palette.text.primary} gutterBottom>
+                  Select the Explorer of your choice
+                </Typography>
+                {/* Show clear preference button if a preference exists for this deeplink type and network */}
+                {deepLinkResolver.isKnownDeeplink() && (() => {
+                  const prefKey = `explorer_pref_${deepLinkResolver.mode}_${deepLinkResolver.network || 'mainnet'}`;
+                  const preferred = localStorage.getItem(prefKey);
+                  if (preferred && listOfExplorers[preferred]) {
+                    return (
+                      <Chip
+                        label={`Preference: ${listOfExplorers[preferred].name}`}
+                        onDelete={() => {
+                          localStorage.removeItem(prefKey);
+                          window.location.reload();
+                        }}
+                        color="primary"
+                        variant="outlined"
+                        sx={{ ml: 1 }}
+                      />
+                    );
+                  }
+                  return null;
+                })()}
+                {/* Checkbox to confirm storing preference */}
+                {deepLinkResolver.isKnownDeeplink() && (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={storePreference}
+                        onChange={e => setStorePreference(e.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label="Remember my choice for this type"
+                    sx={{ ml: 2 }}
+                  />
+                )}
+              </Stack>
             </Grid>
             <Grid item xs={12}>
               <Grid
