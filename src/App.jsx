@@ -76,16 +76,14 @@ const CardanoExplorer = () => {
   const deepLinkResolver = new DeepLinkResolver(path, query);
   const isDeepLink = deepLinkResolver.isDeepLink(path);
 
-  const cExplorerDeepLink = deepLinkResolver.getCExplorerLink("https://cexplorer.io/");
-
   const listOfExplorers = {
     cExplorer: {
       name: "Cexplorer.io",
       description:
         "Ideal for those who need comprehensive data on Cardano's blockchain thanks to its robust analytical tools.",
       image: cExplorerLogo,
-      url: cExplorerDeepLink ? cExplorerDeepLink : "https://cexplorer.io/",
-      isDeepLink: cExplorerDeepLink != null,
+      url: deepLinkResolver.getCExplorerLink("https://cexplorer.io/"),
+      isDeepLink: true,
       networks: ["preprod", "preview"]
     },
     cardanoScan: {

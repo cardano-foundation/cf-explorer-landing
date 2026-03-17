@@ -70,7 +70,7 @@ class DeepLinkResolver {
         link += `epoch/${this.getValue()}`;
         break;
       case "block":
-        link += `block?query=${this.getValue()}`;
+        link += `block?search=block_no%3A${this.getValue()}`;
         break;
       case "transaction":
         link += `tx/${this.getValue()}`;
@@ -79,7 +79,7 @@ class DeepLinkResolver {
         link += `address/${this.getValue()}`;
         break;
       case "governance-action":
-        return null;
+        link += `gov/action?search=${this.getValue()}`;
     }
     return link;
   }
