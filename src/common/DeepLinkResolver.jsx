@@ -70,7 +70,7 @@ class DeepLinkResolver {
         link += `epoch/${this.getValue()}`;
         break;
       case "block":
-        link += `block?query=${this.getValue()}`;
+        link += `block?search=block_no%3A${this.getValue()}`;
         break;
       case "transaction":
         link += `tx/${this.getValue()}`;
@@ -79,7 +79,7 @@ class DeepLinkResolver {
         link += `address/${this.getValue()}`;
         break;
       case "governance-action":
-        return null;
+        link += `gov/action?search=${this.getValue(true)}`;
     }
     return link;
   }
@@ -132,7 +132,7 @@ class DeepLinkResolver {
     return link;
   }
 
-  getValue() {
+  getValue(convert) {
     switch (this.mode) {
       case "epoch":
         return this.query.get("number");
@@ -147,8 +147,8 @@ class DeepLinkResolver {
         // not all explorers handle well gov id as bech32 string, but those who handle gov action handles them
         // fine in hexadecimal/base16.
         const value = this.query.get("governance-action");
-        if (value.startsWith(`gov_action1`)) {
-          const words = bech32.fromWords(bech32.decode(value, 999).words);
+        if (value.startsWith(`gov_action1`) && !convert) {
+          const words = bech32.fromWords(bech32.decode(value).words);
           return words.map(word => word.toString(16).padStart(2, "0")).join("");
         } else {
           return value;
