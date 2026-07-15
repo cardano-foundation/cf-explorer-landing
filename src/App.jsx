@@ -43,8 +43,9 @@ export const CardLink = styled("a")`
 `;
 
 const StyledCard = styled(Card)(({ theme }) => ({
-  width: 345,
-  height: 300,
+  width: "100%",
+  maxWidth: 345,
+  minHeight: 300,
   backgroundColor: theme.palette.background.paper,
   borderRadius: "12px",
   transition: "transform 0.5s ease-in-out",
@@ -197,7 +198,7 @@ const CardanoExplorer = () => {
 
   const explorerCards = sortedExplorers.map(
     ([key, explorer]) => (
-      <Grid item xs={12} sm={6} md={4} key={key}>
+      <Grid item xs={12} sm={6} md={4} key={key} sx={{ display: "flex" }}>
         <CardLink
           href={`${explorer.url}${query.get("value") || ""}`}
           target="_blank"
@@ -360,8 +361,9 @@ const CardanoExplorer = () => {
                 spacing={3}
                 sx={{
                   display: { xs: "grid", sm: "flex" },
+                  flexWrap: "wrap",
                   justifyContent: "center",
-                  alignItems: "center",
+                  alignItems: "stretch",
                 }}
               >
                 {selectedExplorer ? (
