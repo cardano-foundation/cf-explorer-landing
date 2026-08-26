@@ -22,34 +22,16 @@ class DeepLinkResolver {
     });
 
     this.mode = pathSplit[index] === "tx" ? "transaction" : pathSplit[index];
-    // if the path is /tx?id=1234, we need to split the path and get the id from the query
-    // if the path is /tx/1234, we need to split the path and get the id from the path
-    if(query.size === 0 || query.size === 1 && query.has("network")) {
-      this.query = new Map();
-      switch (this.mode) {
-        case "epoch":
-          this.query.set("number", pathSplit[pathSplit.length - 1]);
-          break;
-        case "block":
-          this.query.set("id", pathSplit[pathSplit.length - 1]);
-          break;
-        case "transaction":
-          this.query.set("id", pathSplit[pathSplit.length - 1]);
-          break;
-        case "address":
-          this.query.set("address", pathSplit[pathSplit.length - 1]);
-          break;
-        case "governance-action":
-          this.query.set("governance-action", pathSplit[pathSplit.length - 1]);
-          break;
-        case "drep":
-          this.query.set("drep", pathSplit[pathSplit.length - 1]);
-          break;
-        default:
-          console.log("Unknown mode: " + this.mode);
-      }
-    } else {
-      this.query = query;
+    // Both forms are supported (example for transaction): /tx?id=1234 and /tx/1234.
+    // Start from whatever the query string carries, then fill in the value from the
+    // path segment right after the deeplink type. The two are merged rather than
+    // treated as alternatives, so unrelated params someone appends to a shared link
+    // (tracking parameters, additions from a mail client) cannot hide a path value.
+    this.query = new Map(query);
+    const pathVariable = this.getCorrectPathVariable();
+    const pathValue = pathSplit[index + 1];
+    if (pathVariable && pathValue && !this.query.has(pathVariable)) {
+      this.query.set(pathVariable, pathValue);
     }
     // Network can be set like ?network=preprod or /preprod/tx?id=1234
     if(query.has("network")) {
@@ -177,7 +159,7 @@ class DeepLinkResolver {
         // The id can arrive via the documented `id` query param (e.g. ?id=gov_action1...) as well
         // as the `governance-action` key the path form uses. Guard the null so a missing/malformed
         // value never throws (which would blank the whole page).
-        const value = this.query.get("governance-action") ?? this.query.get("id");
+        const value = this.query.get("governance-action") ?? this.query.get("id") ?? null;
         if (value && value.startsWith(`gov_action1`) && !convert) {
           const words = bech32.fromWords(bech32.decode(value).words);
           return words.map(word => word.toString(16).padStart(2, "0")).join("");

@@ -225,3 +225,33 @@ describe("governance-action deeplink resolves every documented form without cras
     expect(r.isCorrectPathVariable()).toBe(false);
   });
 });
+
+describe("unrelated query params do not break the path form", () => {
+  // Mail clients, newsletters and campaign links append their own params to a
+  // shared URL. The id sits in the path, so an extra param must not hide it.
+  it("keeps the governance action id when a param is appended", () => {
+    const r = make(`/governance-action/${GOV_BECH}`, "parameter=bla");
+    expect(r.isCorrectPathVariable()).toBe(true);
+    expect(r.getValue(true)).toBe(GOV_BECH);
+    expect(r.getCardanoScanLink(CARDANOSCAN)).toBe(`https://cardanoscan.io/govAction/${GOV_HEX}`);
+  });
+
+  it("keeps the id for every other deeplink type too", () => {
+    expect(make("/epoch/42", "utm_source=newsletter").getValue()).toBe("42");
+    expect(make("/block/12345", "utm_source=newsletter").getValue()).toBe("12345");
+    expect(make("/transaction/deadbeef", "utm_source=newsletter").getValue()).toBe("deadbeef");
+    expect(make("/address/addr1xyz", "utm_source=newsletter").getValue()).toBe("addr1xyz");
+    expect(make(`/drep/${DREP}`, "utm_source=newsletter").getValue()).toBe(DREP);
+  });
+
+  it("still applies the network alongside an unrelated param", () => {
+    const r = make(`/preprod/governance-action/${GOV_BECH}`, "parameter=bla");
+    expect(r.network).toBe("preprod");
+    expect(r.getCExplorerLink(CEXPLORER)).toBe(`https://preprod.cexplorer.io/gov/action?search=${GOV_BECH}`);
+  });
+
+  it("lets the query form win when it carries the id itself", () => {
+    const r = make("/transaction/frompath", "id=fromquery");
+    expect(r.getValue()).toBe("fromquery");
+  });
+});
