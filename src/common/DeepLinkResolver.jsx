@@ -1,5 +1,38 @@
 import { bech32 } from "bech32";
+import blake from "blakejs";
 import React from "react";
+
+const normalizeAssetSubject = (value) => {
+  if (!value) return null;
+  const parts = value.split(".");
+  if (parts.length > 2) return null;
+  const subject = parts.join("");
+  if (parts.length === 2 && !/^[0-9a-fA-F]{56}$/.test(parts[0])) return null;
+  if (!/^[0-9a-fA-F]{56,120}$/.test(subject) || subject.length % 2 !== 0) return null;
+  return subject.toLowerCase();
+};
+
+const parsePoolId = (value) => {
+  if (!value) return null;
+  try {
+    let bytes;
+    if (/^[0-9a-fA-F]{56}$/.test(value)) {
+      bytes = Uint8Array.from(value.match(/.{2}/g), (byte) => parseInt(byte, 16));
+    } else {
+      if (value.length !== 56) return null;
+      const decoded = bech32.decode(value);
+      if (decoded.prefix !== "pool") return null;
+      bytes = Uint8Array.from(bech32.fromWords(decoded.words));
+      if (bytes.length !== 28) return null;
+    }
+    return {
+      hex: Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join(""),
+      bech32: bech32.encode("pool", bech32.toWords(bytes)),
+    };
+  } catch {
+    return null;
+  }
+};
 
 const screens = Object.freeze({
   transaction: 'transaction',
@@ -8,7 +41,7 @@ const screens = Object.freeze({
 })
 
 class DeepLinkResolver {
-  acceptedDeepLinks = ["transaction", "block", "epoch", "address", "tx", "governance-action", "drep"];
+  acceptedDeepLinks = ["transaction", "block", "epoch", "address", "tx", "governance-action", "drep", "asset", "pool"];
   acceptedNetworks = ["preprod", "preview"]; // mainnet is default
 
 
@@ -69,6 +102,12 @@ class DeepLinkResolver {
       case "drep":
         link += `drep/${this.getValue()}`;
         break;
+      case "asset":
+        if (this.getAssetSubject()) link += `asset/${this.getAssetSubject()}`;
+        break;
+      case "pool":
+        if (this.getPoolId()) link += `pool/${this.getPoolId().bech32}`;
+        break;
     }
     return link;
   }
@@ -98,6 +137,12 @@ class DeepLinkResolver {
       case "drep":
         link += `drep/${this.getValue()}`;
         break;
+      case "asset":
+        if (this.getAssetSubject()) link += `token/${this.getAssetSubject()}`;
+        break;
+      case "pool":
+        if (this.getPoolId()) link += `pool/${this.getPoolId().hex}`;
+        break;
     }
     return link;
   }
@@ -120,6 +165,12 @@ class DeepLinkResolver {
       case "governance-action":
         link += `governances/${this.getValue()}`;
         break;
+      case "asset":
+        if (this.getAssetSubject()) link += `tokens/${this.getAssetSubject()}`;
+        break;
+      case "pool":
+        if (this.getPoolId()) link += `pools/${this.getPoolId().bech32}`;
+        break;
     }
     return link;
   }
@@ -140,6 +191,27 @@ class DeepLinkResolver {
         break;
     }
     return link;
+  }
+
+  getPoolPmLink(baseLink) {
+    const subject = this.getAssetSubject();
+    if (!subject) return baseLink;
+    const bytes = Uint8Array.from(subject.match(/.{2}/g), (byte) => parseInt(byte, 16));
+    const fingerprint = blake.blake2b(bytes, null, 20);
+    return `${baseLink}${bech32.encode("asset", bech32.toWords(fingerprint))}`;
+  }
+
+  getPoolToolLink(baseLink) {
+    const pool = this.getPoolId();
+    return pool ? `${baseLink}pool/${pool.hex}` : baseLink;
+  }
+
+  getAssetSubject() {
+    return this.mode === "asset" ? normalizeAssetSubject(this.query.get("id")) : null;
+  }
+
+  getPoolId() {
+    return this.mode === "pool" ? parsePoolId(this.query.get("id")) : null;
   }
 
   getValue(convert) {
@@ -170,6 +242,10 @@ class DeepLinkResolver {
         // DReps are forwarded as-is (bech32 drep1...); the explorers that expose a
         // DRep page resolve the bech32 id directly.
         return this.query.get("drep");
+      case "asset":
+        return this.getAssetSubject();
+      case "pool":
+        return this.getPoolId()?.bech32 ?? null;
     }
   }
 
@@ -187,6 +263,10 @@ class DeepLinkResolver {
         return this.query.has("governance-action") || this.query.has("id");
       case "drep":
         return this.query.has("drep");
+      case "asset":
+        return this.getAssetSubject() !== null;
+      case "pool":
+        return this.getPoolId() !== null;
     }
   }
 
@@ -204,6 +284,9 @@ class DeepLinkResolver {
         return "governance-action";
       case "drep":
         return "drep";
+      case "asset":
+      case "pool":
+        return "id";
     }
   }
 
@@ -221,10 +304,19 @@ class DeepLinkResolver {
         return "governance action";
       case "drep":
         return "DRep";
+      case "asset":
+        return "asset";
+      case "pool":
+        return "stake pool";
     }
   }
 
   isKnownDeeplink() {
+    return this.isRecognizedDeeplinkType() &&
+      ((this.mode !== "asset" && this.mode !== "pool") || this.isCorrectPathVariable());
+  }
+
+  isRecognizedDeeplinkType() {
     return this.acceptedDeepLinks.includes(this.mode);
   }
 

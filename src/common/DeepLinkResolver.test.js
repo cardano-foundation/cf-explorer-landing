@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { bech32 } from "bech32";
 import DeepLinkResolver from "./DeepLinkResolver.jsx";
 
 // Build a resolver the way App.jsx does: a pathname plus URL search params.
@@ -14,6 +15,10 @@ const DREP = "drep1ygqzg3ed7rdqeg3343jw0fptqzc3lqtk3rvnnmgq64rj85sxd4sr4";
 const CEXPLORER = "https://cexplorer.io/";
 const CARDANOSCAN = "https://cardanoscan.io/";
 const ADASTAT = "https://adastat.net/";
+const ASSET_SUBJECT = "a0028f350aaabe0545fdcb56b039bfb08e4bb4d8c4d7c3c7d481c235484f534b59";
+const ASSET_FINGERPRINT = "asset17q7r59zlc3dgw0venc80pdv566q6yguw03f0d9";
+const POOL_BECH = "pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy";
+const POOL_HEX = "0f292fcaa02b8b2f9b3c8f9fd8e0bb21abedb692a6d5058df3ef2735";
 
 // Exact links every explorer must produce per deeplink type. The pre-`drep`
 // rows lock the existing behaviour so the change cannot regress them; the
@@ -253,5 +258,115 @@ describe("unrelated query params do not break the path form", () => {
   it("lets the query form win when it carries the id itself", () => {
     const r = make("/transaction/frompath", "id=fromquery");
     expect(r.getValue()).toBe("fromquery");
+  });
+});
+
+describe("native asset deep links", () => {
+  const dotted = `${ASSET_SUBJECT.slice(0, 56)}.${ASSET_SUBJECT.slice(56)}`;
+
+  for (const [label, path, query] of [
+    ["concatenated path", `/asset/${ASSET_SUBJECT}`, ""],
+    ["dotted path", `/asset/${dotted}`, ""],
+    ["query", "/asset", `id=${dotted}`],
+    ["path with extra parameter", `/asset/${ASSET_SUBJECT}`, "utm_source=wallet"],
+    ["uppercase subject", `/asset/${ASSET_SUBJECT.toUpperCase()}`, ""],
+  ]) {
+    it(`${label}: resolves to the same asset on all four explorers`, () => {
+      const r = make(path, query);
+      expect(r.isKnownDeeplink()).toBe(true);
+      expect(r.getValue()).toBe(ASSET_SUBJECT);
+      expect(r.getHumanReadableMode()).toBe("asset");
+      expect(r.getCExplorerLink(CEXPLORER)).toBe(`${CEXPLORER}asset/${ASSET_SUBJECT}`);
+      expect(r.getCardanoScanLink(CARDANOSCAN)).toBe(`${CARDANOSCAN}token/${ASSET_SUBJECT}`);
+      expect(r.getAdaStatLink(ADASTAT)).toBe(`${ADASTAT}tokens/${ASSET_SUBJECT}`);
+      expect(r.getPoolPmLink("https://pool.pm/")).toBe(`https://pool.pm/${ASSET_FINGERPRINT}`);
+    });
+  }
+
+  it("accepts an empty asset name and gives a deterministic fingerprint", () => {
+    const policy = ASSET_SUBJECT.slice(0, 56);
+    const r = make(`/asset/${policy}`);
+    expect(r.isKnownDeeplink()).toBe(true);
+    expect(r.getValue()).toBe(policy);
+    expect(r.getPoolPmLink("https://pool.pm/")).toMatch(/^https:\/\/pool\.pm\/asset1[023456789acdefghjklmnpqrstuvwxyz]{38}$/);
+  });
+
+  it("accepts a 32-byte asset name and rejects one byte more", () => {
+    const policy = ASSET_SUBJECT.slice(0, 56);
+    expect(make(`/asset/${policy}${"ab".repeat(32)}`).isKnownDeeplink()).toBe(true);
+    expect(make(`/asset/${policy}${"ab".repeat(33)}`).isKnownDeeplink()).toBe(false);
+  });
+
+  it("lets the query ID take precedence over a path ID", () => {
+    expect(make(`/asset/${ASSET_SUBJECT}`, `id=${ASSET_SUBJECT.slice(0, 56)}`).getValue()).toBe(ASSET_SUBJECT.slice(0, 56));
+  });
+
+  for (const invalid of [ASSET_FINGERPRINT, "abc", `${ASSET_SUBJECT}0`, `${ASSET_SUBJECT.slice(0, 56)}.abc`, `a.${ASSET_SUBJECT.slice(1)}`, `${ASSET_SUBJECT.slice(0, 56)}..${ASSET_SUBJECT.slice(56)}`]) {
+    it(`rejects malformed subject ${invalid}`, () => {
+      const r = make(`/asset/${invalid}`);
+      expect(r.isKnownDeeplink()).toBe(false);
+      expect(r.isCorrectPathVariable()).toBe(false);
+      expect(r.getCExplorerLink(CEXPLORER)).toBe(CEXPLORER);
+      expect(r.getCardanoScanLink(CARDANOSCAN)).toBe(CARDANOSCAN);
+      expect(r.getAdaStatLink(ADASTAT)).toBe(ADASTAT);
+      expect(r.getPoolPmLink("https://pool.pm/")).toBe("https://pool.pm/");
+    });
+  }
+
+  it("rejects a missing ID and an invalid query overriding a valid path", () => {
+    expect(make("/asset").isKnownDeeplink()).toBe(false);
+    expect(make(`/asset/${ASSET_SUBJECT}`, "id=bad").isKnownDeeplink()).toBe(false);
+  });
+
+  it("keeps existing testnet hosts for supporting explorers", () => {
+    const r = make(`/preprod/asset/${ASSET_SUBJECT}`, "network=preview");
+    expect(r.getCExplorerLink(CEXPLORER)).toBe(`https://preprod.cexplorer.io/asset/${ASSET_SUBJECT}`);
+    expect(r.getCardanoScanLink(CARDANOSCAN)).toBe(`https://preprod.cardanoscan.io/token/${ASSET_SUBJECT}`);
+  });
+});
+
+describe("stake pool deep links", () => {
+  for (const [label, path, query] of [
+    ["bech32 path", `/pool/${POOL_BECH}`, ""],
+    ["hex path", `/pool/${POOL_HEX}`, ""],
+    ["bech32 query", "/pool", `id=${POOL_BECH}`],
+    ["hex query", "/pool", `id=${POOL_HEX}`],
+    ["path with extra parameter", `/pool/${POOL_BECH}`, "utm_source=cardano.org"],
+    ["uppercase hex", `/pool/${POOL_HEX.toUpperCase()}`, ""],
+  ]) {
+    it(`${label}: resolves to the same pool on all four explorers`, () => {
+      const r = make(path, query);
+      expect(r.isKnownDeeplink()).toBe(true);
+      expect(r.getValue()).toBe(POOL_BECH);
+      expect(r.getHumanReadableMode()).toBe("stake pool");
+      expect(r.getCExplorerLink(CEXPLORER)).toBe(`${CEXPLORER}pool/${POOL_BECH}`);
+      expect(r.getCardanoScanLink(CARDANOSCAN)).toBe(`${CARDANOSCAN}pool/${POOL_HEX}`);
+      expect(r.getAdaStatLink(ADASTAT)).toBe(`${ADASTAT}pools/${POOL_BECH}`);
+      expect(r.getPoolToolLink("https://pooltool.io/")).toBe(`https://pooltool.io/pool/${POOL_HEX}`);
+    });
+  }
+
+  const wrongHrp = bech32.encode("addr", bech32.toWords(Uint8Array.from(POOL_HEX.match(/.{2}/g), (byte) => parseInt(byte, 16))));
+  const wrongPayloadSize = bech32.encode("pool", bech32.toWords(new Uint8Array(27)));
+  for (const invalid of ["abc", POOL_HEX.slice(1), `${POOL_HEX}0`, POOL_BECH.slice(0, -1) + "x", wrongHrp, wrongPayloadSize]) {
+    it(`rejects malformed ID ${invalid}`, () => {
+      const r = make(`/pool/${invalid}`);
+      expect(r.isKnownDeeplink()).toBe(false);
+      expect(r.getCExplorerLink(CEXPLORER)).toBe(CEXPLORER);
+      expect(r.getCardanoScanLink(CARDANOSCAN)).toBe(CARDANOSCAN);
+      expect(r.getAdaStatLink(ADASTAT)).toBe(ADASTAT);
+      expect(r.getPoolToolLink("https://pooltool.io/")).toBe("https://pooltool.io/");
+    });
+  }
+
+  it("rejects missing IDs and invalid query IDs overriding valid paths", () => {
+    expect(make("/pool").isKnownDeeplink()).toBe(false);
+    expect(make(`/pool/${POOL_BECH}`, "id=bad").isKnownDeeplink()).toBe(false);
+  });
+
+  it("keeps existing testnet hosts for supporting explorers", () => {
+    const r = make(`/preview/pool/${POOL_HEX}`);
+    expect(r.getCExplorerLink(CEXPLORER)).toBe(`https://preview.cexplorer.io/pool/${POOL_BECH}`);
+    expect(r.getCardanoScanLink(CARDANOSCAN)).toBe(`https://preview.cardanoscan.io/pool/${POOL_HEX}`);
   });
 });

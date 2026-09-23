@@ -32,6 +32,16 @@ const DEEPLINK_PATTERNS = [
     schema: "/governance-action/{GOVERNANCE_ACTION_ID}  ·  /governance-action?id={GOVERNANCE_ACTION_ID}",
     description: "A governance action ID as bech32 (gov_action1…) or raw hex.",
   },
+  {
+    label: "Asset",
+    schema: "/asset/{SUBJECT}  ·  /asset?id={SUBJECT}",
+    description: "Policy ID plus asset name in hex, together or separated by a dot. Fingerprints (asset1…) are not accepted.",
+  },
+  {
+    label: "Stake Pool",
+    schema: "/pool/{POOL_ID}  ·  /pool?id={POOL_ID}",
+    description: "A pool1… bech32 ID or 56-character hex pool key hash.",
+  },
 ];
 
 export const HeaderSection = styled("header")`
