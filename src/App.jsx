@@ -42,6 +42,21 @@ export const CardLink = styled("a")`
   cursor: pointer;
 `;
 
+export const getPreferredExplorer = (resolver, explorers, preferred) => {
+  const explorer = explorers[preferred];
+  return resolver.isKnownDeeplink() && explorer?.isDeepLink &&
+    resolver.canHandleMode(explorer.supportedDeepLinks) && resolver.canHandleNetwork(explorer.networks)
+    ? explorer
+    : null;
+};
+
+export const clearPreferencesForUnknownLink = (resolver, storage) => {
+  if (resolver.isRecognizedDeeplinkType()) return;
+  Object.keys(storage)
+    .filter((key) => key.startsWith("explorer_pref_"))
+    .forEach((key) => storage.removeItem(key));
+};
+
 const StyledCard = styled(Card)(({ theme }) => ({
   width: "100%",
   maxWidth: 345,
@@ -93,7 +108,7 @@ const CardanoExplorer = () => {
       image: cExplorerLogo,
       url: deepLinkResolver.getCExplorerLink("https://cexplorer.io/"),
       isDeepLink: true,
-      supportedDeepLinks: ["transaction", "block", "epoch", "address", "governance-action", "drep"],
+      supportedDeepLinks: ["transaction", "block", "epoch", "address", "governance-action", "drep", "asset", "pool"],
       networks: ["preprod", "preview"]
     },
     cardanoScan: {
@@ -103,7 +118,7 @@ const CardanoExplorer = () => {
       url: deepLinkResolver.getCardanoScanLink("https://cardanoscan.io/"),
       image: cardanoScanLogo,
       isDeepLink: true,
-      supportedDeepLinks: ["transaction", "block", "epoch", "address", "governance-action", "drep"],
+      supportedDeepLinks: ["transaction", "block", "epoch", "address", "governance-action", "drep", "asset", "pool"],
       networks: ["preprod", "preview"]
     },
     dRepTalk: {
@@ -120,9 +135,10 @@ const CardanoExplorer = () => {
       name: "Pool PM",
       description:
         "Essential for NFT enthusiasts and creators who need to monitor and showcase their assets. Dynamic tool for visualizing NFTs. ",
-      url: "https://pool.pm/",
+      url: deepLinkResolver.getPoolPmLink("https://pool.pm/"),
       image: poolPmLogo,
-      isDeepLink: false,
+      isDeepLink: true,
+      supportedDeepLinks: ["asset"],
       networks: []
     },
     eUTxO: {
@@ -140,16 +156,17 @@ const CardanoExplorer = () => {
       url: deepLinkResolver.getAdaStatLink("https://adastat.net/"),
       image: adaStatLogo,
       isDeepLink: true,
-      supportedDeepLinks: ["transaction", "block", "epoch", "address", "governance-action"], // no DRep page
+      supportedDeepLinks: ["transaction", "block", "epoch", "address", "governance-action", "asset", "pool"], // no DRep page
       networks: [] // Preprod and preview currently in progress
     },
     poolTool: {
       name: "PoolTool",
       description:
         "Essential for those who need to make informed staking decisions. Provides data on the performance of pools. ",
-      url: "https://pooltool.io/",
+      url: deepLinkResolver.getPoolToolLink("https://pooltool.io/"),
       image: poolTool,
-      isDeepLink: false,
+      isDeepLink: true,
+      supportedDeepLinks: ["pool"],
       networks: []
     },
   };
@@ -164,21 +181,17 @@ const CardanoExplorer = () => {
 
   // Auto-select and redirect if user has a preference for this deeplink type and network
   useEffect(() => {
-    // If not a known deeplink, remove all explorer preferences so user can reset
+    // Unknown routes reset preferences; malformed IDs for supported types do not.
     if (!deepLinkResolver.isKnownDeeplink()) {
-      Object.keys(localStorage)
-        .filter((k) => k.startsWith('explorer_pref_'))
-        .forEach((k) => localStorage.removeItem(k));
+      clearPreferencesForUnknownLink(deepLinkResolver, localStorage);
       return;
     }
     // Otherwise, auto-redirect if preference exists
     const prefKey = `explorer_pref_${deepLinkResolver.mode}_${deepLinkResolver.network || 'mainnet'}`;
     const preferred = localStorage.getItem(prefKey);
-    if (preferred && listOfExplorers[preferred]) {
-      const explorer = listOfExplorers[preferred];
-      if (handlesDeepLink(explorer) && deepLinkResolver.canHandleNetwork(explorer.networks)) {
-        window.location.href = `${explorer.url}${query.get("value") || ""}`;
-      }
+    const explorer = getPreferredExplorer(deepLinkResolver, listOfExplorers, preferred);
+    if (explorer) {
+      window.location.href = `${explorer.url}${query.get("value") || ""}`;
     }
   }, [deepLinkResolver.mode, deepLinkResolver.network]);
 

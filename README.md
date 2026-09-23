@@ -21,6 +21,8 @@ Deeplinks are available for the following endpoints:
 - `Transaction` - URL `explorer.cardano.org/transaction?id={TRANSACTION_ID}` or `explorer.cardano.org/transaction/{TRANSACTION_ID}`
 - `Address` - URL `explorer.cardano.org/address?address={ADDRESS}` or `explorer.cardano.org/address/{ADDRESS}`
 - `governance-action` - URL `explorer.cardano.org/governance-action?id={GOVERNANCE_ACTION_ID}` or `explorer.cardano.org/governance-action/{GOVERNANCE_ACTION_ID}`
+- `Asset` - URL `explorer.cardano.org/asset?id={SUBJECT}` or `explorer.cardano.org/asset/{SUBJECT}`. The subject is a 56-character hex policy ID followed by an optional hex asset name (up to 64 characters), either concatenated or separated by a dot. An `asset1…` fingerprint cannot be used as input.
+- `Stake pool` - URL `explorer.cardano.org/pool?id={POOL_ID}` or `explorer.cardano.org/pool/{POOL_ID}`. The ID is a `pool1…` bech32 ID or a 56-character hex pool key hash.
 
 Additionally, to the above functions it is possible to specify which network to use. The following networks are supported:
 - `mainnet` - Default network, no need to specify
