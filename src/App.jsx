@@ -16,6 +16,7 @@ import {
 import Header from "src/components/Header";
 import Footer from "src/components/Footer";
 import DeepLinkResolver from "src/common/DeepLinkResolver.jsx";
+import { applyDocumentTitleAndTrack, resolveDocumentTitle } from "src/common/pageTitle.js";
 import cExplorerLogo from "/assets/cexplorer.png";
 import cardanoScanLogo from "/assets/cardano-scan.png";
 import poolPmLogo from "/assets/pool-pm.png";
@@ -89,9 +90,20 @@ const CardanoExplorer = () => {
   };
 
   const query = useQuery();
-  const path = useLocation().pathname;
+  const location = useLocation();
+  const path = location.pathname;
   const deepLinkResolver = new DeepLinkResolver(path, query);
   const isDeepLink = deepLinkResolver.isDeepLink(path);
+
+  // Soft 404 for Matomo: set title (type-only or Matomo 404 pattern) then track once.
+  useEffect(() => {
+    const title = resolveDocumentTitle(deepLinkResolver, {
+      pathname: location.pathname,
+      search: location.search,
+      referrer: typeof document !== "undefined" ? document.referrer : "",
+    });
+    applyDocumentTitleAndTrack(title);
+  }, [location.pathname, location.search, deepLinkResolver.mode, deepLinkResolver.network]);
 
   // An explorer can serve the current deeplink only if it is deeplink-capable and
   // lists this deeplink type in its `supportedDeepLinks`. Each explorer states its
@@ -300,7 +312,7 @@ const CardanoExplorer = () => {
                 </Grid>
             )}
 
-            {isDeepLink && !deepLinkResolver.isKnownDeeplink() && (
+            {isDeepLink && !deepLinkResolver.isRecognizedDeeplinkType() && (
                 <Grid item xs={12}>
                   <Alert
                       severity={"error"}
@@ -308,12 +320,12 @@ const CardanoExplorer = () => {
                         borderRadius: "16px",
                       }}
                   >
-                    DeepLink "{path}" not matching any of the correct paths: {deepLinkResolver.acceptedDeepLinks.join(", ")}.
+                    Page not found. DeepLink "{path}" does not match any of the supported paths: {deepLinkResolver.acceptedDeepLinks.join(", ")}.
                     If this is a bug, please create an issue in Github.
                   </Alert>
                 </Grid>
             )}
-            {isDeepLink && deepLinkResolver.isKnownDeeplink() && !deepLinkResolver.isCorrectPathVariable() && (
+            {isDeepLink && deepLinkResolver.isRecognizedDeeplinkType() && !deepLinkResolver.isCorrectPathVariable() && (
                 <Grid item xs={12}>
                   <Alert
                       severity={"error"}
@@ -321,7 +333,8 @@ const CardanoExplorer = () => {
                         borderRadius: "16px",
                       }}
                   >
-                    You need to set "{deepLinkResolver.getCorrectPathVariable()}" for Deeplink {path}.
+                    Invalid or missing "{deepLinkResolver.getCorrectPathVariable()}" for Deeplink {path}.
+                    Use a valid-looking id for this type (correct length and prefix, no spaces or special characters).
                     If this is a bug, please create an issue in Github.
                   </Alert>
                 </Grid>
