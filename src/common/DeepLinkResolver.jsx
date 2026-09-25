@@ -4,6 +4,8 @@ import React from "react";
 
 const normalizeAssetSubject = (value) => {
   if (!value) return null;
+  // Reject spaces and other junk early; subject is hex (optional dotted policy.name).
+  if (/[\s_]/.test(value) || /[^0-9a-fA-F.]/.test(value)) return null;
   const parts = value.split(".");
   if (parts.length > 2) return null;
   const subject = parts.join("");
@@ -14,6 +16,7 @@ const normalizeAssetSubject = (value) => {
 
 const parsePoolId = (value) => {
   if (!value) return null;
+  if (/\s/.test(value)) return null;
   try {
     let bytes;
     if (/^[0-9a-fA-F]{56}$/.test(value)) {
@@ -31,6 +34,47 @@ const parsePoolId = (value) => {
     };
   } catch {
     return null;
+  }
+};
+
+// Positive integer string for epoch / block numbers (no signs, spaces, or junk).
+const isBlockOrEpochNumber = (value) => typeof value === "string" && /^\d+$/.test(value);
+
+// Cardano tx hashes are blake2b-256 = 64 hex chars.
+const isTransactionHash = (value) => typeof value === "string" && /^[0-9a-fA-F]{64}$/.test(value);
+
+// Shelley-era bech32 addresses / reward accounts. Limit >90 for long enterprise addresses.
+const isCardanoAddress = (value) => {
+  if (!value || /\s/.test(value)) return false;
+  try {
+    const decoded = bech32.decode(value, 120);
+    return ["addr", "addr_test", "stake", "stake_test"].includes(decoded.prefix);
+  } catch {
+    return false;
+  }
+};
+
+// CIP-129 gov action: gov_action1… bech32, or 33-byte hex (32-byte tx hash + 1-byte index).
+const isGovernanceActionId = (value) => {
+  if (!value || /\s/.test(value)) return false;
+  if (/^[0-9a-fA-F]{66}$/.test(value)) return true;
+  try {
+    const decoded = bech32.decode(value, 120);
+    if (decoded.prefix !== "gov_action") return false;
+    const bytes = Uint8Array.from(bech32.fromWords(decoded.words));
+    return bytes.length === 33;
+  } catch {
+    return false;
+  }
+};
+
+const isDrepId = (value) => {
+  if (!value || /\s/.test(value)) return false;
+  try {
+    const decoded = bech32.decode(value, 120);
+    return decoded.prefix === "drep" || decoded.prefix === "drep_script";
+  } catch {
+    return false;
   }
 };
 
@@ -233,8 +277,12 @@ class DeepLinkResolver {
         // value never throws (which would blank the whole page).
         const value = this.query.get("governance-action") ?? this.query.get("id") ?? null;
         if (value && value.startsWith(`gov_action1`) && !convert) {
-          const words = bech32.fromWords(bech32.decode(value).words);
-          return words.map(word => word.toString(16).padStart(2, "0")).join("");
+          try {
+            const words = bech32.fromWords(bech32.decode(value).words);
+            return words.map(word => word.toString(16).padStart(2, "0")).join("");
+          } catch {
+            return null;
+          }
         } else {
           return value;
         }
@@ -252,17 +300,17 @@ class DeepLinkResolver {
   isCorrectPathVariable() {
     switch (this.mode) {
       case "epoch":
-        return this.query.has("number");
+        return isBlockOrEpochNumber(this.query.get("number"));
       case "block":
-        return this.query.has("id");
+        return isBlockOrEpochNumber(this.query.get("id"));
       case "transaction":
-        return this.query.has("id");
+        return isTransactionHash(this.query.get("id"));
       case "address":
-        return this.query.has("address");
+        return isCardanoAddress(this.query.get("address"));
       case "governance-action":
-        return this.query.has("governance-action") || this.query.has("id");
+        return isGovernanceActionId(this.query.get("governance-action") ?? this.query.get("id"));
       case "drep":
-        return this.query.has("drep");
+        return isDrepId(this.query.get("drep"));
       case "asset":
         return this.getAssetSubject() !== null;
       case "pool":
@@ -311,9 +359,9 @@ class DeepLinkResolver {
     }
   }
 
+  // Recognized type and a format-valid id (lengths, prefixes, charset). Soft 404 otherwise.
   isKnownDeeplink() {
-    return this.isRecognizedDeeplinkType() &&
-      ((this.mode !== "asset" && this.mode !== "pool") || this.isCorrectPathVariable());
+    return this.isRecognizedDeeplinkType() && this.isCorrectPathVariable();
   }
 
   isRecognizedDeeplinkType() {

@@ -11,6 +11,12 @@ const make = (path, qs = "") => new DeepLinkResolver(path, new URLSearchParams(q
 const GOV_BECH = "gov_action1jxne7hynfd7frcczwumd2eggps4kvy0msjztz9t0mutpy870ksgqqp6vp3p";
 const GOV_HEX = "91a79f5c934b7c91e3027736d565080c2b6611fb8484b1156fdf16121fcfb41000";
 const DREP = "drep1ygqzg3ed7rdqeg3343jw0fptqzc3lqtk3rvnnmgq64rj85sxd4sr4";
+const TX_HASH = "a".repeat(64);
+const ADDR = bech32.encode(
+  "addr",
+  bech32.toWords(Uint8Array.from({ length: 57 }, (_, i) => i)),
+  120,
+);
 
 const CEXPLORER = "https://cexplorer.io/";
 const CARDANOSCAN = "https://cardanoscan.io/";
@@ -40,17 +46,17 @@ const cases = [
   },
   {
     mode: "transaction",
-    path: "/transaction/deadbeef",
-    cexplorer: "https://cexplorer.io/tx/deadbeef",
-    cardanoscan: "https://cardanoscan.io/transaction/deadbeef",
-    adastat: "https://adastat.net/transactions/deadbeef",
+    path: `/transaction/${TX_HASH}`,
+    cexplorer: `https://cexplorer.io/tx/${TX_HASH}`,
+    cardanoscan: `https://cardanoscan.io/transaction/${TX_HASH}`,
+    adastat: `https://adastat.net/transactions/${TX_HASH}`,
   },
   {
     mode: "address",
-    path: "/address/addr1xyz",
-    cexplorer: "https://cexplorer.io/address/addr1xyz",
-    cardanoscan: "https://cardanoscan.io/address/addr1xyz",
-    adastat: "https://adastat.net/addresses/addr1xyz",
+    path: `/address/${ADDR}`,
+    cexplorer: `https://cexplorer.io/address/${ADDR}`,
+    cardanoscan: `https://cardanoscan.io/address/${ADDR}`,
+    adastat: `https://adastat.net/addresses/${ADDR}`,
   },
   {
     mode: "governance-action",
@@ -106,9 +112,9 @@ describe("network prefixing is unchanged and applies to drep", () => {
 
 describe("tx alias still normalises to transaction", () => {
   it("maps /tx/<id> to the transaction links", () => {
-    const r = make("/tx/deadbeef");
+    const r = make(`/tx/${TX_HASH}`);
     expect(r.mode).toBe("transaction");
-    expect(r.getCardanoScanLink(CARDANOSCAN)).toBe("https://cardanoscan.io/transaction/deadbeef");
+    expect(r.getCardanoScanLink(CARDANOSCAN)).toBe(`https://cardanoscan.io/transaction/${TX_HASH}`);
   });
 });
 
@@ -166,7 +172,7 @@ describe("DRepTalk (governance-only explorer)", () => {
   });
 
   it("serves nothing for non-governance types", () => {
-    for (const path of ["/epoch/42", "/block/12345", "/transaction/deadbeef", "/address/addr1xyz"]) {
+    for (const path of ["/epoch/42", "/block/12345", `/transaction/${TX_HASH}`, `/address/${ADDR}`]) {
       expect(make(path).getDrepTalkLink(DREPTALK)).toBe(DREPTALK);
     }
   });
@@ -244,8 +250,8 @@ describe("unrelated query params do not break the path form", () => {
   it("keeps the id for every other deeplink type too", () => {
     expect(make("/epoch/42", "utm_source=newsletter").getValue()).toBe("42");
     expect(make("/block/12345", "utm_source=newsletter").getValue()).toBe("12345");
-    expect(make("/transaction/deadbeef", "utm_source=newsletter").getValue()).toBe("deadbeef");
-    expect(make("/address/addr1xyz", "utm_source=newsletter").getValue()).toBe("addr1xyz");
+    expect(make(`/transaction/${TX_HASH}`, "utm_source=newsletter").getValue()).toBe(TX_HASH);
+    expect(make(`/address/${ADDR}`, "utm_source=newsletter").getValue()).toBe(ADDR);
     expect(make(`/drep/${DREP}`, "utm_source=newsletter").getValue()).toBe(DREP);
   });
 
@@ -256,8 +262,46 @@ describe("unrelated query params do not break the path form", () => {
   });
 
   it("lets the query form win when it carries the id itself", () => {
-    const r = make("/transaction/frompath", "id=fromquery");
-    expect(r.getValue()).toBe("fromquery");
+    const r = make(`/transaction/${TX_HASH}`, `id=${"b".repeat(64)}`);
+    expect(r.getValue()).toBe("b".repeat(64));
+  });
+});
+
+describe("format validation rejects junk ids (soft 404)", () => {
+  it("accepts well-formed ids for classic types", () => {
+    expect(make("/epoch/42").isKnownDeeplink()).toBe(true);
+    expect(make("/block/0").isKnownDeeplink()).toBe(true);
+    expect(make(`/transaction/${TX_HASH}`).isKnownDeeplink()).toBe(true);
+    expect(make(`/address/${ADDR}`).isKnownDeeplink()).toBe(true);
+    expect(make(`/governance-action/${GOV_HEX}`).isKnownDeeplink()).toBe(true);
+  });
+
+  it("rejects short or junk transaction hashes", () => {
+    expect(make("/transaction/deadbeef").isKnownDeeplink()).toBe(false);
+    expect(make("/transaction/not a hash").isKnownDeeplink()).toBe(false);
+    expect(make(`/transaction/${TX_HASH}_x`).isKnownDeeplink()).toBe(false);
+  });
+
+  it("rejects non-bech32 addresses and values with spaces", () => {
+    expect(make("/address/addr1xyz").isKnownDeeplink()).toBe(false);
+    expect(make("/address/addr1 this").isKnownDeeplink()).toBe(false);
+  });
+
+  it("rejects non-numeric epoch and block values", () => {
+    expect(make("/epoch/latest").isKnownDeeplink()).toBe(false);
+    expect(make("/block/abc").isKnownDeeplink()).toBe(false);
+  });
+
+  it("rejects malformed governance action and drep ids", () => {
+    expect(make("/governance-action/gov_action1qqqq").isKnownDeeplink()).toBe(false);
+    expect(make("/governance-action/not-an-id").isKnownDeeplink()).toBe(false);
+    expect(make("/drep/drep1qqqq").isKnownDeeplink()).toBe(false);
+    expect(make(`/drep/${DREP} `).isKnownDeeplink()).toBe(false);
+  });
+
+  it("still builds explorer URLs from raw path values even when invalid", () => {
+    // Link builders stay permissive; only isKnownDeeplink / titles gate on format.
+    expect(make("/transaction/deadbeef").getCExplorerLink(CEXPLORER)).toBe("https://cexplorer.io/tx/deadbeef");
   });
 });
 
