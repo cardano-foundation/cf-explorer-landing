@@ -24,6 +24,7 @@ import eutxoLogo from "/assets/eutxo.png";
 import adaStatLogo from "/assets/adastat.png";
 import poolTool from "/assets/pool-tool.png";
 import drepTalkLogo from "/assets/dreptalk.png";
+import superCardanoLogo from "/assets/super-cardano.png";
 import LinkIcon from "@mui/icons-material/Link";
 
 import { ThemeProvider } from "@mui/material";
@@ -170,6 +171,16 @@ const CardanoExplorer = () => {
       isDeepLink: true,
       supportedDeepLinks: ["transaction", "block", "epoch", "address", "governance-action", "asset", "pool"], // no DRep page
       networks: [] // Preprod and preview currently in progress
+    },
+    superCardano: {
+      name: "Super Cardano",
+      description:
+        "Explorer and token terminal in one. Ideal for following token prices, DEX pools and holders alongside blocks, transactions and governance.",
+      url: deepLinkResolver.getSuperCardanoLink("https://supercardano.com/"),
+      image: superCardanoLogo,
+      isDeepLink: true,
+      supportedDeepLinks: ["transaction", "block", "epoch", "address", "governance-action", "drep", "asset", "pool"],
+      networks: [] // mainnet only
     },
     poolTool: {
       name: "PoolTool",

@@ -237,6 +237,44 @@ class DeepLinkResolver {
     return link;
   }
 
+  getSuperCardanoLink(baseLink) {
+    // Super Cardano is mainnet only, so a preprod or preview link stays on its
+    // home page instead of opening a mainnet page that has no such id.
+    if (this.acceptedNetworks.includes(this.network)) return baseLink;
+    var link = baseLink;
+    switch (this.mode) {
+      case "epoch":
+        link += `epoch/${this.getValue()}`;
+        break;
+      case "block":
+        link += `block/${this.getValue()}`;
+        break;
+      case "transaction":
+        link += `tx/${this.getValue()}`;
+        break;
+      case "address": {
+        // Reward accounts have their own page; payment addresses use /address.
+        const value = this.getValue();
+        link += value && value.startsWith("stake") ? `stake/${value}` : `address/${value}`;
+        break;
+      }
+      case "governance-action":
+        // Takes both the bech32 (gov_action1…) and the 66-hex form.
+        link += `governance-action/${this.getValue(true)}`;
+        break;
+      case "drep":
+        link += `drep/${this.getValue()}`;
+        break;
+      case "asset":
+        if (this.getAssetSubject()) link += `token/${this.getAssetSubject()}`;
+        break;
+      case "pool":
+        if (this.getPoolId()) link += `pool/${this.getPoolId().bech32}`;
+        break;
+    }
+    return link;
+  }
+
   getPoolPmLink(baseLink) {
     const subject = this.getAssetSubject();
     if (!subject) return baseLink;

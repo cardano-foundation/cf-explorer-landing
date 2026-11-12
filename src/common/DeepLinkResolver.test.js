@@ -414,3 +414,44 @@ describe("stake pool deep links", () => {
     expect(r.getCardanoScanLink(CARDANOSCAN)).toBe(`https://preview.cardanoscan.io/pool/${POOL_HEX}`);
   });
 });
+
+describe("Super Cardano (mainnet only)", () => {
+  const SUPERCARDANO = "https://supercardano.com/";
+  const STAKE = bech32.encode(
+    "stake",
+    bech32.toWords(Uint8Array.from({ length: 29 }, (_, i) => (i === 0 ? 0xe1 : i))),
+    120,
+  );
+  const dotted = `${ASSET_SUBJECT.slice(0, 56)}.${ASSET_SUBJECT.slice(56)}`;
+
+  for (const [label, path, query, expected] of [
+    ["epoch", "/epoch/42", "", `${SUPERCARDANO}epoch/42`],
+    ["block", "/block/12345", "", `${SUPERCARDANO}block/12345`],
+    ["transaction", `/transaction/${TX_HASH}`, "", `${SUPERCARDANO}tx/${TX_HASH}`],
+    ["tx alias", `/tx/${TX_HASH}`, "", `${SUPERCARDANO}tx/${TX_HASH}`],
+    ["payment address", `/address/${ADDR}`, "", `${SUPERCARDANO}address/${ADDR}`],
+    ["stake address", `/address/${STAKE}`, "", `${SUPERCARDANO}stake/${STAKE}`],
+    ["governance action (bech32)", `/governance-action/${GOV_BECH}`, "", `${SUPERCARDANO}governance-action/${GOV_BECH}`],
+    ["governance action (hex)", `/governance-action/${GOV_HEX}`, "", `${SUPERCARDANO}governance-action/${GOV_HEX}`],
+    ["governance action (?id=)", "/governance-action", `id=${GOV_BECH}`, `${SUPERCARDANO}governance-action/${GOV_BECH}`],
+    ["drep", `/drep/${DREP}`, "", `${SUPERCARDANO}drep/${DREP}`],
+    ["asset (dotted subject)", `/asset/${dotted}`, "", `${SUPERCARDANO}token/${ASSET_SUBJECT}`],
+    ["pool (hex id)", `/pool/${POOL_HEX}`, "", `${SUPERCARDANO}pool/${POOL_BECH}`],
+  ]) {
+    it(`${label}: builds the exact link`, () => {
+      const r = make(path, query);
+      expect(r.isKnownDeeplink()).toBe(true);
+      expect(r.getSuperCardanoLink(SUPERCARDANO)).toBe(expected);
+    });
+  }
+
+  it("stays on the home page for preprod and preview links", () => {
+    expect(make(`/preprod/transaction/${TX_HASH}`).getSuperCardanoLink(SUPERCARDANO)).toBe(SUPERCARDANO);
+    expect(make(`/drep/${DREP}`, "network=preview").getSuperCardanoLink(SUPERCARDANO)).toBe(SUPERCARDANO);
+  });
+
+  it("leaves the base link for malformed asset and pool ids", () => {
+    expect(make("/asset/abc").getSuperCardanoLink(SUPERCARDANO)).toBe(SUPERCARDANO);
+    expect(make("/pool/pool1invalid").getSuperCardanoLink(SUPERCARDANO)).toBe(SUPERCARDANO);
+  });
+});
